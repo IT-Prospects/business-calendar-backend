@@ -1,7 +1,39 @@
 ﻿namespace Model
 {
-    public class Event
+    public class Event : BaseObject
     {
+        #region props
+
+        public string Title { get; set; }
+
+        public string ShortDescription { get; set; }
+
+        public string Description { get; set; }
+
+        public string FullDescription { get; set; }
+
+        public ICollection<string> Topics { get; set; }
+
+        public string Address { get; set; }
+
+        public ICollection<DateTime> EventDates { get; set; }
+
+        public Image Image { get; set; }
+
+        public long Image_Id { get; set; }
+
+        public Company Company { get; set; }
+
+        public long Company_Id { get; set; }
+
+        public City City { get; set; }
+
+        public long City_Id { get; set; }
+
+        #endregion
+
+        #region ctors
+
         public Event()
         {
             Title = string.Empty;
@@ -44,30 +76,6 @@
             City_Id = city.Id;
         }
 
-        public string Title { get; set; }
-
-        public string ShortDescription { get; set; }
-
-        public string Description { get; set; }
-
-        public string FullDescription { get; set; }
-
-        public ICollection<string> Topics { get; set; }
-
-        public string Address { get; set; }
-
-        public ICollection<DateTime> EventDates { get; set; }
-
-        public Image Image { get; set; }
-
-        public long Image_Id { get; set; }
-
-        public Company Company { get; set; }
-
-        public long Company_Id { get; set; }
-
-        public City City { get; set; }
-
-        public long City_Id { get; set; }
+        #endregion
     }
 }

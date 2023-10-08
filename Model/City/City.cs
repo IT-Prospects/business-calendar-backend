@@ -2,7 +2,15 @@
 {
     public class City : BaseObject
     {
-        public City() 
+        #region props
+
+        public string Name { get; set; }
+
+        #endregion
+
+        #region ctors
+
+        public City()
         {
             Name = string.Empty;
         }
@@ -12,6 +20,7 @@
             Name = name;
         }
 
-        public string Name { get; set; }
+        #endregion
+
     }
 }

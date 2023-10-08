@@ -2,7 +2,15 @@
 {
     public class Image : BaseObject
     {
-        public Image() 
+        #region props
+
+        public string Path { get; set; }
+
+        #endregion
+
+        #region ctors
+
+        public Image()
         {
             Path = string.Empty;
         }
@@ -12,6 +20,6 @@
             Path = path;
         }
 
-        public string Path { get; set; }
+        #endregion
     }
 }
