@@ -1,5 +1,6 @@
 using DAL.Common;
 using DAL.Context;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 
 namespace BusinessCalendar
@@ -43,6 +44,13 @@ namespace BusinessCalendar
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "images")),
+                RequestPath = "/images"
+            });
 
             app.UseHttpsRedirection();
 
