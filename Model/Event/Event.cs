@@ -1,4 +1,6 @@
-﻿namespace Model
+﻿using Model.DTO;
+
+namespace Model
 {
     public class Event : BaseObject
     {
@@ -35,6 +37,7 @@
             string description,
             string address,
             DateTime eventDate,
+            TimeSpan eventDuration,
             Image image
             )
         {
@@ -42,8 +45,21 @@
             Description = description;
             Address = address;
             EventDate = eventDate;
+            EventDuration = eventDuration;
             Image = image;
             Image_Id = image.Id;
+        }
+
+        public Event(EventDTO eventDTO)
+        {
+            Id = eventDTO.Id ?? 0;
+            Title = eventDTO.Title;
+            Description = eventDTO.Description;
+            Address = eventDTO.Address;
+            EventDate = eventDTO.EventDate.Value;
+            EventDuration = eventDTO.EventDuration.Value;
+            Image = eventDTO.Image;
+            Image_Id = eventDTO.Image_Id.Value;
         }
 
         #endregion
