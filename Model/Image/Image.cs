@@ -1,23 +1,22 @@
-﻿namespace Model
+﻿using System;
+
+namespace Model
 {
     public class Image : BaseObject
     {
         #region props
 
-        public string Path { get; set; }
+        public string Name { get; set; }
 
         #endregion
 
         #region ctors
 
-        public Image()
-        {
-            Path = string.Empty;
-        }
+        public Image() {}
 
-        public Image(string path)
+        public Image(string name)
         {
-            Path = path;
+            Name = name;
         }
 
         #endregion
