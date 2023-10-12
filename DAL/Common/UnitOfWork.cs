@@ -9,9 +9,9 @@ namespace DAL.Common
         private ModelContext _context;
 
         public UnitOfWork() : this(
-            ConfigurationHelper.GetString("serverName"),
-            ConfigurationHelper.GetInt("serverPort"),
-            ConfigurationHelper.GetString("databaseName"),
+            ConfigurationHelper.GetString("dbServerHost"),
+            ConfigurationHelper.GetInt("dbServerPort"),
+            ConfigurationHelper.GetString("dbName"),
             ConfigurationHelper.GetString("dbAdminLogin"),
             ConfigurationHelper.GetString("dbAdminPassword")
             ) 

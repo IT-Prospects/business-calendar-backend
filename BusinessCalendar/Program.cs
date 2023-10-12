@@ -21,13 +21,12 @@ namespace BusinessCalendar
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
             builder.Services.AddScoped<ModelContext>(x =>
             {
                 var connectionString = ContextHelper.BuildConnectionString(
-                    ConfigurationHelper.GetString("serverName"),
-                    ConfigurationHelper.GetInt("serverPort"),
-                    ConfigurationHelper.GetString("databaseName"),
+                    ConfigurationHelper.GetString("dbServerHost"),
+                    ConfigurationHelper.GetInt("dbServerPort"),
+                    ConfigurationHelper.GetString("dbName"),
                     ConfigurationHelper.GetString("dbAdminLogin"),
                     ConfigurationHelper.GetString("dbAdminPassword")
                     );
@@ -48,7 +47,7 @@ namespace BusinessCalendar
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
-           Path.Combine(builder.Environment.ContentRootPath, "images")),
+                    Path.Combine(builder.Environment.ContentRootPath, ConfigurationHelper.GetString("imagesPath"))),
                 RequestPath = "/images"
             });
 
