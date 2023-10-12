@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessCalendar", "BusinessCalendar.csproj", "{28B2CF5D-D6ED-4C35-8B43-905461063404}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessCalendar", "BusinessCalendar\BusinessCalendar.csproj", "{28B2CF5D-D6ED-4C35-8B43-905461063404}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1Model", "Model\1Model.csproj", "{8067EC61-0E9D-4032-BBD8-A888754C51FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2DAL", "DAL\2DAL.csproj", "{5103836B-E581-4F53-8C74-9D813FEA55AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{28B2CF5D-D6ED-4C35-8B43-905461063404}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28B2CF5D-D6ED-4C35-8B43-905461063404}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28B2CF5D-D6ED-4C35-8B43-905461063404}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8067EC61-0E9D-4032-BBD8-A888754C51FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8067EC61-0E9D-4032-BBD8-A888754C51FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8067EC61-0E9D-4032-BBD8-A888754C51FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8067EC61-0E9D-4032-BBD8-A888754C51FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5103836B-E581-4F53-8C74-9D813FEA55AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5103836B-E581-4F53-8C74-9D813FEA55AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5103836B-E581-4F53-8C74-9D813FEA55AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5103836B-E581-4F53-8C74-9D813FEA55AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
