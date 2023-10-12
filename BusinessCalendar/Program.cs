@@ -51,8 +51,6 @@ namespace BusinessCalendar
                 RequestPath = "/images"
             });
 
-            app.UseHttpsRedirection();
-
             app.UseAuthorization();
 
             app.MapControllers();
