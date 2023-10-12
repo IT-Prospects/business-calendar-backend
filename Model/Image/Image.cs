@@ -2,7 +2,7 @@
 
 namespace Model
 {
-    public class Image : BaseObject
+    public class Image : DomainObject
     {
         #region props
 
@@ -12,7 +12,10 @@ namespace Model
 
         #region ctors
 
-        public Image() {}
+        public Image() 
+        {
+            Name = string.Empty;
+        }
 
         public Image(string name)
         {

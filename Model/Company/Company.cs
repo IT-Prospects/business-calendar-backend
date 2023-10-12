@@ -1,6 +1,6 @@
 ﻿namespace Model
 {
-    public class Company : BaseObject
+    public class Company : DomainObject
     {
         #region props
 

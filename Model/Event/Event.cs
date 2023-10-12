@@ -1,8 +1,9 @@
 ﻿using Model.DTO;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Model
 {
-    public class Event : BaseObject
+    public class Event : DomainObject
     {
         #region props
 
@@ -29,7 +30,10 @@ namespace Model
             Title = string.Empty;
             Description = string.Empty;
             Address = string.Empty;
-            Image = null;
+            EventDate = DateTime.MinValue;
+            EventDuration = TimeSpan.Zero;
+            Image = new Image();
+            Image_Id = 0;
         }
 
         public Event(
@@ -48,18 +52,6 @@ namespace Model
             EventDuration = eventDuration;
             Image = image;
             Image_Id = image.Id;
-        }
-
-        public Event(EventDTO eventDTO)
-        {
-            Id = eventDTO.Id ?? 0;
-            Title = eventDTO.Title;
-            Description = eventDTO.Description;
-            Address = eventDTO.Address;
-            EventDate = eventDTO.EventDate.Value;
-            EventDuration = eventDTO.EventDuration.Value;
-            Image = eventDTO.Image;
-            Image_Id = eventDTO.Image_Id.Value;
         }
 
         #endregion

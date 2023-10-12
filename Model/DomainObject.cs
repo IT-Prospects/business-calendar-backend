@@ -6,7 +6,7 @@ namespace Model
     /// Базовый класс
     /// </summary>
     [Description("Базовый класс")]
-    public abstract class BaseObject
+    public abstract class DomainObject
     {
         public virtual long Id { get; set; }
     }

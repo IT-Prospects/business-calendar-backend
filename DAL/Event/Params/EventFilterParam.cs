@@ -8,17 +8,12 @@ namespace DAL.Params
 {
     public class EventFilterParam
     {
-        public DateTime? CurrentDate { get; set; }
+        public DateTime TargetDate { get; set; }
 
-        public DateTime? TargetDate { get; set; }
+        public int Offset { get; set; }
 
-        public int? Offset { get; set; }
-
-        public EventFilterParam() { }
-
-        public EventFilterParam(DateTime? currentDate, DateTime? targetDate, int? offset)
+        public EventFilterParam(DateTime targetDate, int offset)
         {
-            CurrentDate = currentDate;
             TargetDate = targetDate;
             Offset = offset;
         }

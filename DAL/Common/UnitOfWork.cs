@@ -41,7 +41,7 @@ namespace DAL.Common
 
         public ModelContext Context() => _context;
 
-        public DbSet<T> DbSet<T>() where T : BaseObject
+        public DbSet<T> DbSet<T>() where T : DomainObject
         {
             return _context.Set<T>();
         }

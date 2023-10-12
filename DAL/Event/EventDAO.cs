@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Model;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
@@ -60,14 +61,23 @@ namespace DAL
             }
         }
 
-        public virtual IEnumerable<Event> GetAllByFilter(EventFilterParam param)
+        public virtual IEnumerable<Event> GetAnnounceEvents(EventAnnouncementParam param)
         {
             try
             {
-                if (param.CurrentDate.HasValue)
-                    return DbSet.Where(x => x.EventDate >= param.CurrentDate.Value).Take(3).ToList();
-                else
-                    return DbSet.Where(x => x.EventDate.Date == param.TargetDate.Value.Date).Skip(param.Offset ?? 0).Take(6).ToList();
+                return DbSet.Where(x => x.EventDate >= param.CurrentDate).Take(3).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ошибка при получении объекта {DbSet.GetType()}", ex);
+            }
+        }
+
+        public virtual IEnumerable<Event> GetEventsByDate(EventFilterParam param)
+        {
+            try
+            {
+                return DbSet.Where(x => x.EventDate.Date == param.TargetDate.Date).Skip(param.Offset).Take(6).ToList();
             }
             catch (Exception ex)
             {

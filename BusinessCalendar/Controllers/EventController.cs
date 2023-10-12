@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using Model.DTO;
+using Model.Enum;
 using System.Text;
 
 namespace BusinessCalendar.Controllers
@@ -16,23 +17,25 @@ namespace BusinessCalendar.Controllers
     {
         private readonly ILogger<EventController> _logger;
         private readonly EventDAO _eventDAO;
+        private readonly ImageDAO _imageDAO;
         private readonly UnitOfWork _unitOfWork;
 
         public EventController(ILogger<EventController> logger, UnitOfWork uow)
         {
             _logger = logger;
             _eventDAO = new EventDAO(uow);
+            _imageDAO = new ImageDAO(uow);
             _unitOfWork = uow;
         }
 
         [HttpGet]
         [Route("targetdate={targetDate}&offset={offset}")]
-        public IActionResult Get(DateTime? targetDate, int? offset)
+        public IActionResult Get(DateTime targetDate, int offset)
         {
             try
             {
-                var param = new EventFilterParam(null, targetDate, offset);
-                return Ok(new ResponseObject(_eventDAO.GetAllByFilter(param)));
+                var param = new EventFilterParam(targetDate, offset);
+                return Ok(new ResponseObject(_eventDAO.GetEventsByDate(param)));
             }
             catch (Exception ex)
             {
@@ -42,12 +45,12 @@ namespace BusinessCalendar.Controllers
 
         [HttpGet]
         [Route("currentdate={currentDate}")]
-        public IActionResult Get(DateTime? currentDate)
+        public IActionResult Get(DateTime currentDate)
         {
             try
             {
-                var param = new EventFilterParam(currentDate, null, null);
-                return Ok(new ResponseObject(_eventDAO.GetAllByFilter(param)));
+                var param = new EventAnnouncementParam(currentDate);
+                return Ok(new ResponseObject(_eventDAO.GetAnnounceEvents(param)));
             }
             catch (Exception ex)
             {
@@ -75,11 +78,11 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                if (!IsValidate(itemDTO, out string message))
+                if (!IsValidateDomainObject(itemDTO, ControllerAction.Create, out string message))
                 {
                     return BadRequest(new ResponseObject(message));
                 }
-                var item = new Event(itemDTO);
+                var item = MappingToDomainObject(itemDTO);
                 var newItem = _eventDAO.Create();
                 SetValues(item, newItem);
                 _unitOfWork.SaveChanges();
@@ -97,12 +100,12 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                if (!IsValidate(itemDTO, out string message))
+                if (!IsValidateDomainObject(itemDTO, ControllerAction.Update, out string message))
                 {
                     return BadRequest(new ResponseObject(message));
                 }
-                var item = new Event(itemDTO);
-                var oldItem = _eventDAO.GetItemForUpdate(item.Id);
+                var item = MappingToDomainObject(itemDTO);
+                var oldItem = _eventDAO.GetItemForUpdate(itemDTO.Id!.Value);
                 SetValues(item, oldItem);
                 _unitOfWork.SaveChanges();
                 return Ok(new ResponseObject(oldItem));
@@ -134,27 +137,54 @@ namespace BusinessCalendar.Controllers
             _unitOfWork.Context().Entry(dst).CurrentValues.SetValues(src);
         }
 
-        private bool IsValidate(EventDTO item, out string message)
+        private bool IsValidateDomainObject(EventDTO item, ControllerAction controllerAction, out string message)
         {
+            if (controllerAction == ControllerAction.Update && (!item.Id.HasValue || item.Id.Value == 0))
+            {
+                message = "Отсутствует идентификатор мероприятия";
+                return false;
+            }
+
             var stringBuilder = new StringBuilder(string.Empty);
             var requiredFieldErrorMessageTemplate = "Не заполнено обязательное поле {0}";
 
             if (string.IsNullOrWhiteSpace(item.Title))
                 stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Название"));
+
             if (string.IsNullOrWhiteSpace(item.Description))
                 stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Описание"));
+
             if (string.IsNullOrWhiteSpace(item.Address))
                 stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Адрес проведения"));
+
             if (!item.EventDate.HasValue)
                 stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Дата и время проведения"));
+
             if (!item.EventDuration.HasValue)
                 stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Длительность"));
+
             if (!item.Image_Id.HasValue)
                 stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Изображение"));
 
             message = stringBuilder.ToString();
 
             return message == string.Empty;
+        }
+
+        private Event MappingToDomainObject(EventDTO itemDTO)
+        {
+            var image = _imageDAO.GetById(itemDTO.Image_Id!.Value);
+            return new Event(
+                itemDTO.Title!,
+                itemDTO.Description!,
+                itemDTO.Address!,
+                itemDTO.EventDate!.Value,
+                itemDTO.EventDuration!.Value,
+                image
+                )
+            {
+                Id = itemDTO.Id!.Value
+            };
         }
     }
 }

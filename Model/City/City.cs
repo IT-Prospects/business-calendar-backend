@@ -1,6 +1,6 @@
 ﻿namespace Model
 {
-    public class City : BaseObject
+    public class City : DomainObject
     {
         #region props
 
