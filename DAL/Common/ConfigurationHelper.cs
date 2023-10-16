@@ -5,9 +5,9 @@ namespace DAL.Common
     public static class ConfigurationHelper
     {
         private static IConfiguration? _configuration;
-        private static readonly string _configNotInitialized = "Конфигурация не инициализирована";
-        private static readonly string _notFountMessage = "Не найдено значение {0} в конфигурации приложения";
-        private static readonly string _invalidFormatMessage = "При попытке преобразовать значение {0} произошла ошибка";
+        private static readonly string _configNotInitialized = "The configuration is not initialized";
+        private static readonly string _notFountMessage = "The \"{0}\" value was not found in the application configuration";
+        private static readonly string _invalidFormatMessage = "An error occurred while trying to convert the value \"{0}\"";
         public static void SetConfiguration(IConfiguration configuration)
         {
             _configuration = configuration;

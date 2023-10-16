@@ -73,19 +73,6 @@ namespace BusinessCalendar.Controllers
             _unitOfWork.Context().Entry(dst).CurrentValues.SetValues(src);
         }
 
-        private void GetFormParameters(IFormCollection formCollection, out IFormFile file, out string extension)
-        {
-            if (formCollection?.ContainsKey("files") ?? false)
-            {
-                file = formCollection.Files[0];
-                extension = GetFileExtension(file.FileName);
-            }
-            else
-            {
-                throw new ArgumentNullException("Файл не передан!");
-            }
-        }
-
         private string GetFileExtension(string fileName)
         {
             return fileName[fileName.LastIndexOf('.')..];

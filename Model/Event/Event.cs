@@ -1,4 +1,5 @@
 ﻿using Model.DTO;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Model
@@ -15,7 +16,7 @@ namespace Model
 
         public DateTime EventDate { get; set; }
 
-        public TimeSpan EventDuration { get; set; } 
+        public TimeSpan EventDuration { get; set; }
 
         public Image Image { get; set; }
 

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Model;
 using Model.DTO;
 using Model.Enum;
+using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 
 namespace BusinessCalendar.Controllers
@@ -141,33 +143,33 @@ namespace BusinessCalendar.Controllers
         {
             if (controllerAction == ControllerAction.Update && (!item.Id.HasValue || item.Id.Value == 0))
             {
-                message = "Отсутствует идентификатор мероприятия";
+                message = "Event ID is missing";
                 return false;
             }
 
             var stringBuilder = new StringBuilder(string.Empty);
-            var requiredFieldErrorMessageTemplate = "Не заполнено обязательное поле {0}";
+            var requiredFieldErrorMessageTemplate = "Required field \"{0}\" is not filled in";
 
             if (string.IsNullOrWhiteSpace(item.Title))
-                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Название"));
+                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(item.Title)));
 
             if (string.IsNullOrWhiteSpace(item.Description))
-                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Описание"));
+                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(item.Description)));
 
             if (string.IsNullOrWhiteSpace(item.Address))
-                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Адрес проведения"));
+                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(item.Address)));
 
             if (!item.EventDate.HasValue)
-                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Дата и время проведения"));
+                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(item.EventDate)));
 
             if (!item.EventDuration.HasValue)
-                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Длительность"));
+                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(item.EventDuration)));
 
             if (!item.Image_Id.HasValue)
-                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, "Изображение"));
+                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(item.Image_Id)));
 
             message = stringBuilder.ToString();
-
+            
             return message == string.Empty;
         }
 

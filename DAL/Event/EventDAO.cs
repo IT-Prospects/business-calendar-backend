@@ -12,6 +12,8 @@ namespace DAL
 {
     public class EventDAO
     {
+        private const string _errorReceiveObject = "Error when receiving an object {0}";
+
         private UnitOfWork _unitOfWork;
 
         public EventDAO(UnitOfWork uow)
@@ -45,7 +47,7 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при получении объекта {DbSet.GetType()}", ex);
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
             }
         }
 
@@ -57,7 +59,7 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при получении объекта {DbSet.GetType()}", ex);
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
             }
         }
 
@@ -69,7 +71,7 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при получении объекта {DbSet.GetType()}", ex);
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
             }
         }
 
@@ -81,7 +83,7 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при получении объекта {DbSet.GetType()}", ex);
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
             }
         }
 
