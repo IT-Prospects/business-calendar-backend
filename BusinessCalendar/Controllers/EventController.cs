@@ -88,9 +88,9 @@ namespace BusinessCalendar.Controllers
                 _unitOfWork.SaveChanges();
                 return Ok(new ResponseObject(newItem));
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject (ex.Message));
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ex.Message));
             }
         }
 
@@ -174,16 +174,17 @@ namespace BusinessCalendar.Controllers
         private Event MappingToDomainObject(EventDTO itemDTO)
         {
             var image = _imageDAO.GetById(itemDTO.Image_Id!.Value);
-            return new Event(
-                itemDTO.Title!,
-                itemDTO.Description!,
-                itemDTO.Address!,
-                itemDTO.EventDate!.Value,
-                itemDTO.EventDuration!.Value,
-                image
-                )
+            return new Event
+                    (
+                        itemDTO.Title!,
+                        itemDTO.Description!,
+                        itemDTO.Address!,
+                        itemDTO.EventDate!.Value,
+                        itemDTO.EventDuration!.Value,
+                        image
+                    )
             {
-                Id = itemDTO.Id!.Value
+                Id = itemDTO.Id ?? 0
             };
         }
     }

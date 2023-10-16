@@ -53,7 +53,7 @@ namespace DAL
         {
             try
             {
-                return DbSet.ToList();
+                return DbSetView;
             }
             catch (Exception ex)
             {
@@ -65,7 +65,7 @@ namespace DAL
         {
             try
             {
-                return DbSet.Where(x => x.EventDate >= param.CurrentDate).Take(3).ToList();
+                return DbSetView.Where(x => x.EventDate >= param.CurrentDate).Take(3).ToList();
             }
             catch (Exception ex)
             {
@@ -77,7 +77,7 @@ namespace DAL
         {
             try
             {
-                return DbSet.Where(x => x.EventDate.Date == param.TargetDate.Date).Skip(param.Offset).Take(6).ToList();
+                return DbSetView.Where(x => x.EventDate.Date == param.TargetDate.Date).Skip(param.Offset).Take(6).ToList();
             }
             catch (Exception ex)
             {
