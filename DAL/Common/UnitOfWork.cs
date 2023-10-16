@@ -22,20 +22,15 @@ namespace DAL.Common
             _context = GetMainContext(connectionString);
         }
 
-        public UnitOfWork(string connectionString, int commandTimeout)
-        {
-            _context = GetMainContext(connectionString, commandTimeout);
-        }
-
         public UnitOfWork(string host, int port, string database, string username, string password)
         {
             var connectionString = ContextHelper.BuildConnectionString(host, port, database, username, password);
             _context = GetMainContext(connectionString);
         }
 
-        private ModelContext GetMainContext(string connectionString, int commandTimeout = 60)
+        private ModelContext GetMainContext(string connectionString)
         {
-            var context = new ModelContext(connectionString, commandTimeout);
+            var context = new ModelContext(connectionString);
             return context;
         }
 
@@ -57,7 +52,6 @@ namespace DAL.Common
             {
                 _context.ClearEntities();
                 _context.Dispose();
-                _context = null;
             }
         }
     }

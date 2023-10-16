@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.Diagnostics.CodeAnalysis;
 
 namespace DAL.Common
 {
     public static class ConfigurationHelper
     {
-        private static IConfiguration _configuration;
+        private static IConfiguration? _configuration;
         private static readonly string _configNotInitialized = "Конфигурация не инициализирована";
         private static readonly string _notFountMessage = "Не найдено значение {0} в конфигурации приложения";
         private static readonly string _invalidFormatMessage = "При попытке преобразовать значение {0} произошла ошибка";
@@ -24,7 +23,7 @@ namespace DAL.Common
         {
             CheckConfiguration();
 
-            var value = _configuration[key];
+            var value = _configuration![key];
             return value == null ? throw new ArgumentException(string.Format(_notFountMessage, key)) : value.ToString();
         }
 
@@ -32,7 +31,7 @@ namespace DAL.Common
         {
             CheckConfiguration();
 
-            var value = _configuration[key] ?? throw new ArgumentException(string.Format(_notFountMessage, key));
+            var value = _configuration![key] ?? throw new ArgumentException(string.Format(_notFountMessage, key));
             if (!long.TryParse(value, out long parsedValue))
                 throw new FormatException(string.Format(_invalidFormatMessage, key));
 
@@ -43,7 +42,7 @@ namespace DAL.Common
         {
             CheckConfiguration();
 
-            var value = _configuration[key] ?? throw new ArgumentException(string.Format(_notFountMessage, key));
+            var value = _configuration![key] ?? throw new ArgumentException(string.Format(_notFountMessage, key));
             if (!int.TryParse(value, out int parsedValue))
                 throw new FormatException(string.Format(_invalidFormatMessage, key));
 

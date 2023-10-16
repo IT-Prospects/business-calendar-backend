@@ -7,20 +7,23 @@ namespace DAL.Context
     public class ModelContext : DbContext
     {
         protected string connectionString;
-        protected int commandTimeout;
 
-        public ModelContext(string connectionString, int commandTimeout) : base()
+        public ModelContext(string connectionString) : base()
         {
             this.connectionString = connectionString;
-            this.commandTimeout = commandTimeout;
+        }
+
+        public ModelContext(DbContextOptions<ModelContext> options)
+            : base(options)
+        {
+            connectionString = string.Empty;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder OptionsBuilder)
         {
             if (!OptionsBuilder.IsConfigured)
             {
-                OptionsBuilder.UseNpgsql(connectionString,
-                    x => x.CommandTimeout(commandTimeout));
+                OptionsBuilder.UseNpgsql(connectionString);
 #if DEBUG
                 OptionsBuilder.LogTo(x => System.Diagnostics.Debug.Write(x));
 #endif

@@ -1,7 +1,7 @@
 using DAL.Common;
 using DAL.Context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Options;
 
 namespace BusinessCalendar
 {
@@ -10,30 +10,25 @@ namespace BusinessCalendar
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            var configBuilder = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json");
-            ConfigurationHelper.SetConfiguration(configBuilder.Build());
+
+            ConfigurationHelper.SetConfiguration(builder.Configuration);
 
             builder.Services.AddControllers()
                             .AddNewtonsoftJson();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddDbContext<ModelContext>(options =>
+            {
+                options.UseNpgsql(GetConnectionString());
+            });
+
             builder.Services.AddScoped<ModelContext>(x =>
             {
-                var connectionString = ContextHelper.BuildConnectionString(
-                    ConfigurationHelper.GetString("dbServerHost"),
-                    ConfigurationHelper.GetInt("dbServerPort"),
-                    ConfigurationHelper.GetString("dbName"),
-                    ConfigurationHelper.GetString("dbAdminLogin"),
-                    ConfigurationHelper.GetString("dbAdminPassword")
-                    );
-
-                return new ModelContext(connectionString, 60);
+                return new ModelContext(GetConnectionString());
             });
-            
+
             builder.Services.AddScoped(x => new UnitOfWork());
 
             var app = builder.Build();
@@ -56,6 +51,17 @@ namespace BusinessCalendar
             app.MapControllers();
 
             app.Run();
+        }
+
+        private static string GetConnectionString()
+        {
+            return ContextHelper.BuildConnectionString(
+                    ConfigurationHelper.GetString("dbServerHost"),
+                    ConfigurationHelper.GetInt("dbServerPort"),
+                    ConfigurationHelper.GetString("dbName"),
+                    ConfigurationHelper.GetString("dbAdminLogin"),
+                    ConfigurationHelper.GetString("dbAdminPassword")
+                    );
         }
     }
 }
