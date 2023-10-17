@@ -124,7 +124,9 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
+                var delEvent = _eventDAO.GetById(id);
                 _eventDAO.Delete(id);
+                _imageDAO.Delete(delEvent.Image_Id);
                 _unitOfWork.SaveChanges();
                 return Ok(new ResponseObject(id));
             }
@@ -169,7 +171,7 @@ namespace BusinessCalendar.Controllers
                 stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(item.Image_Id)));
 
             message = stringBuilder.ToString();
-            
+
             return message == string.Empty;
         }
 

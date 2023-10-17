@@ -24,10 +24,10 @@ namespace DAL
 
         protected DbSet<Event> DbSet;
 
-        protected IQueryable<Event> DbSetView => 
+        protected IQueryable<Event> DbSetView =>
             from ev in DbSet
             join img in _unitOfWork.DbSet<Image>() on ev.Image_Id equals img.Id
-            select new Event 
+            select new Event
             {
                 Id = ev.Id,
                 Title = ev.Title,
@@ -67,7 +67,7 @@ namespace DAL
         {
             try
             {
-                return DbSetView.Where(x => x.EventDate >= param.CurrentDate).Take(3).ToList();
+                return DbSetView.Where(x => x.EventDate >= param.CurrentDate).OrderBy(x => x.EventDate).Take(3).ToList();
             }
             catch (Exception ex)
             {
@@ -79,7 +79,7 @@ namespace DAL
         {
             try
             {
-                return DbSetView.Where(x => x.EventDate.Date == param.TargetDate.Date).Skip(param.Offset).Take(6).ToList();
+                return DbSetView.Where(x => x.EventDate.Date == param.TargetDate.Date).OrderBy(x => x.EventDate).Skip(param.Offset).Take(6).ToList();
             }
             catch (Exception ex)
             {
