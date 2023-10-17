@@ -15,7 +15,7 @@ namespace DAL.Context
                 entity.Property(e => e.Title).HasColumnName("title").HasColumnType("text").IsRequired();
                 entity.Property(e => e.Description).HasColumnName("description").HasColumnType("text").IsRequired();
                 entity.Property(e => e.Address).HasColumnName("address").HasColumnType("text").IsRequired();
-                entity.Property(e => e.EventDate).HasColumnName("eventdate").HasColumnType("timestamp with time zone").IsRequired();
+                entity.Property(e => e.EventDate).HasColumnName("eventdate").HasColumnType("timestamp without time zone").IsRequired();
                 entity.Property(e => e.EventDuration).HasColumnName("eventduration").HasColumnType("interval").IsRequired();
                 entity.Property(e => e.Image_Id).HasColumnName("image_id").HasColumnType("bigint").IsRequired();
 
