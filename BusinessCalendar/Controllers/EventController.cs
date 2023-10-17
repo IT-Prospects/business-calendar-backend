@@ -37,7 +37,8 @@ namespace BusinessCalendar.Controllers
             try
             {
                 var param = new EventFilterParam(targetDate, offset);
-                return Ok(new ResponseObject(_eventDAO.GetEventsByDate(param)));
+                var result = _eventDAO.GetEventsByDate(param).Select(MappingToDTO);
+                return Ok(new ResponseObject(result));
             }
             catch (Exception ex)
             {
@@ -52,7 +53,8 @@ namespace BusinessCalendar.Controllers
             try
             {
                 var param = new EventAnnouncementParam(currentDate);
-                return Ok(new ResponseObject(_eventDAO.GetAnnounceEvents(param)));
+                var result = _eventDAO.GetAnnounceEvents(param).Select(MappingToDTO);
+                return Ok(new ResponseObject(result));
             }
             catch (Exception ex)
             {
@@ -66,7 +68,7 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                return Ok(new ResponseObject(_eventDAO.GetById(id)));
+                return Ok(new ResponseObject(MappingToDTO(_eventDAO.GetById(id))));
             }
             catch (Exception ex)
             {
@@ -80,7 +82,7 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                if (!IsValidateDomainObject(itemDTO, ControllerAction.Create, out string message))
+                if (!IsValidDTO(itemDTO, ControllerAction.Create, out string message))
                 {
                     return BadRequest(new ResponseObject(message));
                 }
@@ -88,7 +90,7 @@ namespace BusinessCalendar.Controllers
                 var newItem = _eventDAO.Create();
                 SetValues(item, newItem);
                 _unitOfWork.SaveChanges();
-                return Ok(new ResponseObject(newItem));
+                return Ok(new ResponseObject(MappingToDTO(newItem)));
             }
             catch (Exception ex)
             {
@@ -102,7 +104,7 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                if (!IsValidateDomainObject(itemDTO, ControllerAction.Update, out string message))
+                if (!IsValidDTO(itemDTO, ControllerAction.Update, out string message))
                 {
                     return BadRequest(new ResponseObject(message));
                 }
@@ -110,7 +112,7 @@ namespace BusinessCalendar.Controllers
                 var oldItem = _eventDAO.GetItemForUpdate(itemDTO.Id!.Value);
                 SetValues(item, oldItem);
                 _unitOfWork.SaveChanges();
-                return Ok(new ResponseObject(oldItem));
+                return Ok(new ResponseObject(MappingToDTO(oldItem)));
             }
             catch (Exception ex)
             {
@@ -141,7 +143,7 @@ namespace BusinessCalendar.Controllers
             _unitOfWork.Context().Entry(dst).CurrentValues.SetValues(src);
         }
 
-        private bool IsValidateDomainObject(EventDTO item, ControllerAction controllerAction, out string message)
+        private bool IsValidDTO(EventDTO item, ControllerAction controllerAction, out string message)
         {
             if (controllerAction == ControllerAction.Update && (!item.Id.HasValue || item.Id.Value == 0))
             {
@@ -189,6 +191,21 @@ namespace BusinessCalendar.Controllers
                     )
             {
                 Id = itemDTO.Id ?? 0
+            };
+        }
+
+        private EventDTO MappingToDTO(Event item)
+        {
+            return new EventDTO()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Description = item.Description,
+                Address = item.Address,
+                EventDate = item.EventDate,
+                EventDuration = item.EventDuration,
+                Image_Id = item.Image!.Id,
+                ImageName = item.Image!.Name
             };
         }
     }

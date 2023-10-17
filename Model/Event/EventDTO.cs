@@ -22,5 +22,7 @@ namespace Model.DTO
         public TimeSpan? EventDuration { get; set; }
 
         public long? Image_Id { get; set; }
+
+        public string? ImageName { get; set; }
     }
 }
