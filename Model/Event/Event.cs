@@ -18,7 +18,7 @@ namespace Model
 
         public TimeSpan EventDuration { get; set; }
 
-        public Image Image { get; set; }
+        public Image? Image { get; set; }
 
         public long Image_Id { get; set; }
 
@@ -33,7 +33,7 @@ namespace Model
             Address = string.Empty;
             EventDate = DateTime.MinValue;
             EventDuration = TimeSpan.Zero;
-            Image = new Image();
+            Image = null;
             Image_Id = 0;
         }
 

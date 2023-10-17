@@ -42,7 +42,7 @@ namespace _2DAL.Migrations
                         .HasColumnName("description");
 
                     b.Property<DateTime>("EventDate")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("eventdate");
 
                     b.Property<TimeSpan>("EventDuration")

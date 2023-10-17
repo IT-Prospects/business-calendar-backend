@@ -13,8 +13,10 @@ namespace BusinessCalendar
 
             ConfigurationHelper.SetConfiguration(builder.Configuration);
 
-            builder.Services.AddControllers()
-                            .AddNewtonsoftJson();
+            builder.Services.AddControllers().AddNewtonsoftJson(jsonOptions =>
+            {
+                jsonOptions.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
