@@ -1,4 +1,5 @@
 using BusinessCalendar.Common;
+using BusinessCalendar.Helpers;
 using DAL;
 using DAL.Common;
 using DAL.Params;
@@ -42,7 +43,7 @@ namespace BusinessCalendar.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ex.Message));
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
             }
         }
 
@@ -58,7 +59,7 @@ namespace BusinessCalendar.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ex.Message));
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
             }
         }
 
@@ -72,7 +73,7 @@ namespace BusinessCalendar.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ex.Message));
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
             }
         }
 
@@ -94,7 +95,7 @@ namespace BusinessCalendar.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ex.Message));
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
             }
         }
 
@@ -116,7 +117,7 @@ namespace BusinessCalendar.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ex.Message));
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
             }
         }
 
@@ -130,11 +131,12 @@ namespace BusinessCalendar.Controllers
                 _eventDAO.Delete(id);
                 _imageDAO.Delete(delEvent.Image_Id);
                 _unitOfWork.SaveChanges();
+                ImageFileHelper.DeleteImageFile(delEvent.Image!.Name);
                 return Ok(new ResponseObject(id));
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ex.Message));
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
             }
         }
 

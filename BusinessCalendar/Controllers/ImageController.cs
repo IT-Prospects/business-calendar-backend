@@ -4,6 +4,9 @@ using DAL;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using System.Configuration;
+using BusinessCalendar.Common;
+using Microsoft.EntityFrameworkCore;
+using BusinessCalendar.Helpers;
 
 namespace BusinessCalendar.Controllers
 {
@@ -25,27 +28,28 @@ namespace BusinessCalendar.Controllers
         [HttpPost]
         public IActionResult Post(IFormFile formFile)
         {
-            var fileExtension = GetFileExtension(formFile.FileName);
-
-            var newItem = _ImageDAO.Create();
-            var item = new Image
+            string path = string.Empty;
+            try
             {
-                Name = $"{Guid.NewGuid()}{fileExtension}"
-            };
+                var fileExtension = GetFileExtension(formFile.FileName);
+                var item = new Image($"{Guid.NewGuid()}{fileExtension}");
+                ImageFileHelper.CreateImageFile(formFile, path = item.Name);
 
-            var filePath = Path.Combine(".", ConfigurationHelper.GetString("imagesPath"), item.Name);
-            var fileInfo = new FileInfo(filePath);
-            if(!fileInfo.Exists)
-            {
-                using (var fs = fileInfo.Create())
-                {
-                    formFile.CopyTo(fs);
-                }
+                var newItem = _ImageDAO.Create();
+                SetValues(item, newItem);
+                _unitOfWork.SaveChanges();
+                return Ok(new ResponseObject(newItem));
             }
-            
-            SetValues(item, newItem);
-            _unitOfWork.SaveChanges();
-            return Ok(newItem);
+            catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+            {
+                if(!string.IsNullOrEmpty(path))
+                    ImageFileHelper.DeleteImageFile(path);
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
         }
 
         //[HttpPut]
