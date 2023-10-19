@@ -67,7 +67,7 @@ namespace DAL
         {
             try
             {
-                return DbSetView.Where(x => x.EventDate >= param.CurrentDate).OrderBy(x => x.EventDate).Take(3).ToList();
+                return DbSetView.Where(x => x.EventDate > param.CurrentDateTime).OrderBy(x => x.EventDate).Take(3).ToList();
             }
             catch (Exception ex)
             {

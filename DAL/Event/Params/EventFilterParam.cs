@@ -12,9 +12,9 @@ namespace DAL.Params
 
         public int Offset { get; set; }
 
-        public EventFilterParam(DateTime targetDate, int offset)
+        public EventFilterParam(DateOnly targetDate, int offset)
         {
-            TargetDate = targetDate;
+            TargetDate = targetDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
             Offset = offset;
         }
     }

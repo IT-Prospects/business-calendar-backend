@@ -8,11 +8,11 @@ namespace DAL.Params
 {
     public class EventAnnouncementParam
     {
-        public DateTime CurrentDate { get; set; }
+        public DateTime CurrentDateTime { get; set; }
 
-        public EventAnnouncementParam(DateTime currentDate)
+        public EventAnnouncementParam(DateTime currentDateTime)
         {
-            CurrentDate = currentDate;
+            CurrentDateTime = currentDateTime;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace BusinessCalendar.Controllers
 
         [HttpGet]
         [Route("targetdate={targetDate}&offset={offset}")]
-        public IActionResult Get(DateTime targetDate, int offset)
+        public IActionResult Get(DateOnly targetDate, int offset)
         {
             try
             {
