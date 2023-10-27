@@ -5,6 +5,7 @@ using Model;
 using BusinessCalendar.Common;
 using Microsoft.EntityFrameworkCore;
 using BusinessCalendar.Helpers;
+using Model.DTO;
 
 namespace BusinessCalendar.Controllers
 {
@@ -14,31 +15,28 @@ namespace BusinessCalendar.Controllers
     {
         private readonly ILogger<ImageController> _logger;
         private readonly ImageDAO _imageDAO;
+        private readonly EventDAO _eventDAO;
         private readonly UnitOfWork _unitOfWork;
 
         public ImageController(ILogger<ImageController> logger, UnitOfWork uow)
         {
             _logger = logger;
             _imageDAO = new ImageDAO(uow);
+            _eventDAO = new EventDAO(uow);
             _unitOfWork = uow;
         }
 
         [HttpPost]
         public IActionResult Post(IFormFile formFile)
         {
-            string path = string.Empty;
+            var path = string.Empty;
             try
             {
-                var fileExtension = GetFileExtension(formFile.FileName);
-                var item = new Image($"{Guid.NewGuid()}{fileExtension}");
-                ImageFileHelper.CreateImageFile(formFile, path = item.Name);
-
-                var newItem = _imageDAO.Create();
-                SetValues(item, newItem);
+                (var newItem, path) = AddImage(formFile);
                 _unitOfWork.SaveChanges();
-                return Ok(new ResponseObject(newItem));
+                return Ok(new ResponseObject(MappingToDTO(newItem)));
             }
-            catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+            catch (Exception ex) when (ex is DbUpdateException or DbUpdateConcurrencyException)
             {
                 if(!string.IsNullOrEmpty(path))
                     ImageFileHelper.DeleteImageFile(path);
@@ -50,25 +48,55 @@ namespace BusinessCalendar.Controllers
             }
         }
 
-        //[HttpPut]
-        //[Consumes("application/x-www-form-urlencoded", "multipart/form-data")]
-        //public long Put([FromForm] IFormCollection formCollection)
-        //{
-        //    var oldItem = _imageDAO.GetById(item.Id);
-        //    SetValues(item, oldItem);
-        //    _unitOfWork.SaveChanges();
-        //    return oldItem.Id;
-        //    return 0;
-        //}
+        [HttpGet]
+        [Route("event_Id={event_Id}")]
+        public IActionResult Get(long event_Id)
+        {
+            try
+            {
+                var result = _imageDAO.GetAdditionalByEventId(event_Id);
+                return Ok(new ResponseObject(result.Select(MappingToDTO)));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
+        }
 
-        //[HttpDelete]
-        //[Route("/{id}")]
-        //public long Delete(long id)
-        //{
-        //    _imageDAO.Delete(id);
-        //    _unitOfWork.SaveChanges();
-        //    return id;
-        //}
+        [HttpPost]
+        [Route("Event")]
+        public IActionResult AddImageForEvent(IFormFile formFile, long event_Id)
+        {
+            var path = string.Empty;
+            try
+            {
+                (var newItem, path) = AddImage(formFile, event_Id);
+                _unitOfWork.SaveChanges();
+                return Ok(new ResponseObject(MappingToDTO(newItem)));
+            }
+            catch (Exception ex) when (ex is DbUpdateException or DbUpdateConcurrencyException)
+            {
+                if (!string.IsNullOrEmpty(path))
+                    ImageFileHelper.DeleteImageFile(path);
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
+        }
+
+        private (Image, string) AddImage(IFormFile formFile, long? event_Id = null)
+        {
+            string path;
+            var fileExtension = GetFileExtension(formFile.FileName);
+            var item = new Image($"{Guid.NewGuid()}{fileExtension}", false, event_Id.HasValue ? _eventDAO.GetById(event_Id.Value) : null);
+            ImageFileHelper.CreateImageFile(formFile, path = item.Name);
+
+            var newItem = _imageDAO.Create();
+            SetValues(item, newItem);
+            return (newItem, path);
+        }
 
         private void SetValues(Image src, Image dst)
         {
@@ -78,6 +106,17 @@ namespace BusinessCalendar.Controllers
         private string GetFileExtension(string fileName)
         {
             return fileName[fileName.LastIndexOf('.')..];
+        }
+
+        public ImageDTO MappingToDTO(Image image)
+        {
+            return new ImageDTO()
+            {
+                Id = image.Id,
+                Name = image.Name,
+                IsMain = image.IsMain,
+                Event_Id = image.Event_Id,
+            };
         }
     }
 }

@@ -17,13 +17,13 @@ namespace DAL.Context
                 entity.Property(e => e.Address).HasColumnName("address").HasColumnType("text").IsRequired();
                 entity.Property(e => e.EventDate).HasColumnName("eventdate").HasColumnType("timestamp with time zone").IsRequired();
                 entity.Property(e => e.EventDuration).HasColumnName("eventduration").HasColumnType("interval").IsRequired();
-                entity.Property(e => e.Image_Id).HasColumnName("image_id").HasColumnType("bigint").IsRequired();
 
                 entity
-                    .HasOne(d => d.Image)
-                    .WithOne()
-                    .HasForeignKey<Event>(d => d.Image_Id)
-                    .HasConstraintName("fk_event_image");
+                    .HasMany(d => d.Images)
+                    .WithOne(d => d.Event)
+                    .HasForeignKey(d => d.Event_Id)
+                    .HasConstraintName("fk_event_image")
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Image>(entity =>
@@ -32,6 +32,9 @@ namespace DAL.Context
                 entity.HasKey(e => e.Id).HasName("pk_imageset");
                 entity.Property(e => e.Id).HasColumnName("id").HasColumnType("bigint").ValueGeneratedOnAdd();
                 entity.Property(e => e.Name).HasColumnName("name").HasColumnType("text").IsRequired();
+                entity.Property(e => e.IsMain).HasColumnName("ismain").HasColumnType("boolean").IsRequired();
+
+                entity.Property(e => e.Event_Id).HasColumnName("event_id").HasColumnType("bigint");
 
                 entity.HasIndex(i => i.Name).IsUnique();
             });

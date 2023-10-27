@@ -20,19 +20,7 @@ namespace DAL
         protected DbSet<Event> DbSet;
 
         protected IQueryable<Event> DbSetView =>
-            from ev in DbSet
-            join img in _unitOfWork.DbSet<Image>() on ev.Image_Id equals img.Id
-            select new Event
-            {
-                Id = ev.Id,
-                Title = ev.Title,
-                Description = ev.Description,
-                Address = ev.Address,
-                EventDate = ev.EventDate,
-                EventDuration = ev.EventDuration,
-                Image = img,
-                Image_Id = img.Id,
-            };
+            DbSet.Include(x => x.Images);
 
         public Event GetById(long id)
         {

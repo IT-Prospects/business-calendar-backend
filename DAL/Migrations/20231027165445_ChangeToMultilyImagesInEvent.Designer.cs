@@ -3,6 +3,7 @@ using System;
 using DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace _2DAL.Migrations
 {
     [DbContext(typeof(ModelContext))]
-    partial class ModelContextModelSnapshot : ModelSnapshot
+    [Migration("20231027165445_ChangeToMultilyImagesInEvent")]
+    partial class ChangeToMultilyImagesInEvent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,6 +72,9 @@ namespace _2DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("EventId")
+                        .HasColumnType("bigint");
+
                     b.Property<long?>("Event_Id")
                         .HasColumnType("bigint")
                         .HasColumnName("event_id");
@@ -85,6 +91,8 @@ namespace _2DAL.Migrations
                     b.HasKey("Id")
                         .HasName("pk_imageset");
 
+                    b.HasIndex("EventId");
+
                     b.HasIndex("Event_Id");
 
                     b.HasIndex("Name")
@@ -96,6 +104,10 @@ namespace _2DAL.Migrations
             modelBuilder.Entity("Model.Image", b =>
                 {
                     b.HasOne("Model.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("Model.Event", null)
                         .WithMany("Images")
                         .HasForeignKey("Event_Id")
                         .OnDelete(DeleteBehavior.Cascade)

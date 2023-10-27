@@ -14,9 +14,7 @@
 
         public TimeSpan EventDuration { get; set; }
 
-        public Image? Image { get; set; }
-
-        public long Image_Id { get; set; }
+        public ICollection<Image> Images { get; set; }
 
         #endregion
 
@@ -29,8 +27,7 @@
             Address = string.Empty;
             EventDate = DateTime.MinValue;
             EventDuration = TimeSpan.Zero;
-            Image = null;
-            Image_Id = 0;
+            Images = new HashSet<Image>();
         }
 
         public Event(
@@ -39,7 +36,7 @@
             string address,
             DateTime eventDate,
             TimeSpan eventDuration,
-            Image image
+            ICollection<Image> images
             )
         {
             Title = title;
@@ -47,8 +44,7 @@
             Address = address;
             EventDate = eventDate;
             EventDuration = eventDuration;
-            Image = image;
-            Image_Id = image.Id;
+            Images = images;
         }
 
         #endregion

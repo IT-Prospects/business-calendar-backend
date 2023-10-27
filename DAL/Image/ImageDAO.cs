@@ -44,11 +44,53 @@ namespace DAL
             }
         }
 
+        public ICollection<Image> GetAllByEventId(long event_Id)
+        {
+            try
+            {
+                return DbSet.Where(x => x.Event_Id == event_Id).ToHashSet();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
+            }
+        }
+
+        public ICollection<Image> GetAdditionalByEventId(long event_Id)
+        {
+            try
+            {
+                return DbSet.Where(x => x.Event_Id == event_Id && !x.IsMain).ToHashSet();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
+            }
+        }
+
+        public Image GetMainByEventId(long event_Id)
+        {
+            try
+            {
+                return DbSet.Single(x => x.Event_Id == event_Id && x.IsMain);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
+            }
+        }
+
         public Image Create()
         {
             var item = new Image();
             DbSet.Add(item);
             return item;
+        }
+
+        public Image GetItemForUpdate(long id)
+        {
+            var item = DbSet.Local.SingleOrDefault(x => x.Id == id);
+            return (item = DbSet.Single(x => x.Id == id));
         }
 
         public void Delete(long id)
