@@ -26,6 +26,22 @@ namespace BusinessCalendar.Controllers
             _unitOfWork = uow;
         }
 
+
+        [HttpGet]
+        [Route("event_id={event_Id}")]
+        public IActionResult Get(long event_Id)
+        {
+            try
+            {
+                var result = _imageDAO.GetAdditionalByEventId(event_Id);
+                return Ok(new ResponseObject(result.Select(MappingToDTO)));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
+        }
+
         [HttpPost]
         public IActionResult Post(IFormFile formFile)
         {
@@ -41,21 +57,6 @@ namespace BusinessCalendar.Controllers
                 if(!string.IsNullOrEmpty(path))
                     ImageFileHelper.DeleteImageFile(path);
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
-            }
-        }
-
-        [HttpGet]
-        [Route("event_Id={event_Id}")]
-        public IActionResult Get(long event_Id)
-        {
-            try
-            {
-                var result = _imageDAO.GetAdditionalByEventId(event_Id);
-                return Ok(new ResponseObject(result.Select(MappingToDTO)));
             }
             catch (Exception ex)
             {
