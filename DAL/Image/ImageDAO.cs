@@ -6,7 +6,9 @@ namespace DAL
 {
     public class ImageDAO
     {
-        private UnitOfWork _unitOfWork;
+        private const string _errorReceiveObject = "Error when receiving an object {0}";
+
+        private readonly UnitOfWork _unitOfWork;
 
         public ImageDAO(UnitOfWork uow)
         {
@@ -18,7 +20,7 @@ namespace DAL
 
         protected IQueryable<Image> DbSetView => DbSet;
 
-        public virtual Image GetById(long id)
+        public Image GetById(long id)
         {
             try
             {
@@ -26,11 +28,11 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при получении объекта {DbSet.GetType()}", ex);
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
             }
         }
 
-        public virtual Image GetByName(string name)
+        public Image GetByName(string name)
         {
             try
             {
@@ -38,18 +40,18 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при получении объекта {DbSet.GetType()}", ex);
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
             }
         }
 
-        public virtual Image Create()
+        public Image Create()
         {
             var item = new Image();
             DbSet.Add(item);
             return item;
         }
 
-        public virtual void Delete(long id)
+        public void Delete(long id)
         {
             DbSet.Remove(GetById(id));
         }

@@ -24,7 +24,7 @@ namespace DAL.Common
             CheckConfiguration();
 
             var value = _configuration![key];
-            return value == null ? throw new ArgumentException(string.Format(_notFountMessage, key)) : value.ToString();
+            return value ?? throw new ArgumentException(string.Format(_notFountMessage, key));
         }
 
         public static long GetLong(string key)

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Model
+﻿namespace Model
 {
     public class Image : DomainObject
     {

@@ -1,8 +1,4 @@
-﻿using Model.DTO;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-
-namespace Model
+﻿namespace Model
 {
     public class Event : DomainObject
     {

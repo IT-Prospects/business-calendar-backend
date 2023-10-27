@@ -1,12 +1,7 @@
 ﻿using DAL.Common;
 using DAL.Params;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Model;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DAL
 {
@@ -14,7 +9,7 @@ namespace DAL
     {
         private const string _errorReceiveObject = "Error when receiving an object {0}";
 
-        private UnitOfWork _unitOfWork;
+        private readonly UnitOfWork _unitOfWork;
 
         public EventDAO(UnitOfWork uow)
         {
@@ -39,7 +34,7 @@ namespace DAL
                 Image_Id = img.Id,
             };
 
-        public virtual Event GetById(long id)
+        public Event GetById(long id)
         {
             try
             {
@@ -51,7 +46,7 @@ namespace DAL
             }
         }
 
-        public virtual IEnumerable<Event> GetAll()
+        public IEnumerable<Event> GetAll()
         {
             try
             {
@@ -63,7 +58,7 @@ namespace DAL
             }
         }
 
-        public virtual IEnumerable<Event> GetAnnounceEvents(EventAnnouncementParam param)
+        public IEnumerable<Event> GetAnnounceEvents(EventAnnouncementParam param)
         {
             try
             {
@@ -75,7 +70,7 @@ namespace DAL
             }
         }
 
-        public virtual IEnumerable<Event> GetEventsByDate(EventFilterParam param)
+        public IEnumerable<Event> GetEventsByDate(EventFilterParam param)
         {
             try
             {
@@ -87,20 +82,20 @@ namespace DAL
             }
         }
 
-        public virtual Event Create()
+        public Event Create()
         {
             var item = new Event();
             DbSet.Add(item);
             return item;
         }
 
-        public virtual Event GetItemForUpdate(long id)
+        public Event GetItemForUpdate(long id)
         {
             var item = DbSet.Local.SingleOrDefault(x => x.Id == id);
             return (item = DbSet.Single(x => x.Id == id));
         }
 
-        public virtual void Delete(long id)
+        public void Delete(long id)
         {
             DbSet.Remove(GetById(id));
         }

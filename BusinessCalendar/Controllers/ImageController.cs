@@ -1,9 +1,7 @@
 ﻿using DAL.Common;
-using DAL.Params;
 using DAL;
 using Microsoft.AspNetCore.Mvc;
 using Model;
-using System.Configuration;
 using BusinessCalendar.Common;
 using Microsoft.EntityFrameworkCore;
 using BusinessCalendar.Helpers;
@@ -15,13 +13,13 @@ namespace BusinessCalendar.Controllers
     public class ImageController : Controller
     {
         private readonly ILogger<ImageController> _logger;
-        private readonly ImageDAO _ImageDAO;
+        private readonly ImageDAO _imageDAO;
         private readonly UnitOfWork _unitOfWork;
 
         public ImageController(ILogger<ImageController> logger, UnitOfWork uow)
         {
             _logger = logger;
-            _ImageDAO = new ImageDAO(uow);
+            _imageDAO = new ImageDAO(uow);
             _unitOfWork = uow;
         }
 
@@ -35,7 +33,7 @@ namespace BusinessCalendar.Controllers
                 var item = new Image($"{Guid.NewGuid()}{fileExtension}");
                 ImageFileHelper.CreateImageFile(formFile, path = item.Name);
 
-                var newItem = _ImageDAO.Create();
+                var newItem = _imageDAO.Create();
                 SetValues(item, newItem);
                 _unitOfWork.SaveChanges();
                 return Ok(new ResponseObject(newItem));
@@ -56,7 +54,7 @@ namespace BusinessCalendar.Controllers
         //[Consumes("application/x-www-form-urlencoded", "multipart/form-data")]
         //public long Put([FromForm] IFormCollection formCollection)
         //{
-        //    var oldItem = _ImageDAO.GetById(item.Id);
+        //    var oldItem = _imageDAO.GetById(item.Id);
         //    SetValues(item, oldItem);
         //    _unitOfWork.SaveChanges();
         //    return oldItem.Id;
@@ -67,7 +65,7 @@ namespace BusinessCalendar.Controllers
         //[Route("/{id}")]
         //public long Delete(long id)
         //{
-        //    _ImageDAO.Delete(id);
+        //    _imageDAO.Delete(id);
         //    _unitOfWork.SaveChanges();
         //    return id;
         //}
