@@ -109,7 +109,7 @@ namespace BusinessCalendar.Controllers
             return fileName[fileName.LastIndexOf('.')..];
         }
 
-        public ImageDTO MappingToDTO(Image image)
+        private ImageDTO MappingToDTO(Image image)
         {
             return new ImageDTO()
             {
