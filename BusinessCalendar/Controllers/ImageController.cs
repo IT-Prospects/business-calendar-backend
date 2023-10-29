@@ -29,7 +29,7 @@ namespace BusinessCalendar.Controllers
 
         [HttpGet]
         [Route("event_id={event_Id}")]
-        public IActionResult Get(long event_Id)
+        public IActionResult GetAdditionalImageByEventId(long event_Id)
         {
             try
             {
