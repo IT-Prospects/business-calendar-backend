@@ -39,6 +39,27 @@ namespace DAL.Context
                 entity.HasIndex(i => i.Name).IsUnique();
             });
 
+            modelBuilder.Entity<EventSignUp>(entity =>
+            {
+                entity.ToTable("eventsignupset");
+                entity.HasKey(e => e.Id).HasName("pk_eventsignupset");
+                entity.Property(e => e.Id).HasColumnName("id").HasColumnType("bigint").ValueGeneratedOnAdd();
+                entity.Property(e => e.FirstName).HasColumnName("firstname").HasColumnType("text").IsRequired();
+                entity.Property(e => e.LastName).HasColumnName("lastname").HasColumnType("text").IsRequired();
+                entity.Property(e => e.Patronymic).HasColumnName("patronymic").HasColumnType("text");
+                entity.Property(e => e.Email).HasColumnName("email").HasColumnType("text").IsRequired();
+                entity.Property(e => e.PhoneNumber).HasColumnName("phonenumber").HasColumnType("text").IsRequired();
+
+                entity.Property(e => e.Event_Id).HasColumnName("event_id").HasColumnType("bigint");
+
+                entity
+                    .HasOne(d => d.Event)
+                    .WithMany()
+                    .HasForeignKey(d => d.Event_Id)
+                    .HasConstraintName("fk_eventsignup_event")
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
             return modelBuilder;
         }
     }

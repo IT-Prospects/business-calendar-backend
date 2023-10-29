@@ -69,5 +69,6 @@ namespace DAL.Context
 
         public DbSet<Event> EventSet { get; set; }
         public DbSet<Image> ImageSet { get; set; }
+        public DbSet<EventSignUp> EventSignUpSet { get; set; }
     }
 }
