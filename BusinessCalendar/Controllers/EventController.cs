@@ -85,13 +85,14 @@ namespace BusinessCalendar.Controllers
                     return BadRequest(new ResponseObject(message));
                 }
                 var item = MappingToDomainObject(itemDTO);
-
-                var image = _imageDAO.GetById(itemDTO.Image_Id!.Value);
-                image.IsMain = true;
-                item.Images.Add(image);
-
                 var newItem = _eventDAO.Create();
                 SetValues(item, newItem);
+                _unitOfWork.SaveChanges();
+
+                var image = _imageDAO.GetItemForUpdate(itemDTO.Image_Id!.Value);
+                newItem.Images.Add(image);
+                image.Event = newItem;
+                image.IsMain = true;
                 _unitOfWork.SaveChanges();
                 return Ok(new ResponseObject(MappingToDTO(newItem)));
             }
