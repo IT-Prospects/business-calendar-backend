@@ -84,16 +84,17 @@ namespace BusinessCalendar.Controllers
                 {
                     return BadRequest(new ResponseObject(message));
                 }
+                var image = _imageDAO.GetItemForUpdate(itemDTO.Image_Id!.Value);
                 var item = MappingToDomainObject(itemDTO);
+                item.Image = image;
+
                 var newItem = _eventDAO.Create();
                 SetValues(item, newItem);
                 _unitOfWork.SaveChanges();
 
-                var image = _imageDAO.GetItemForUpdate(itemDTO.Image_Id!.Value);
-                newItem.Images.Add(image);
                 image.Event = newItem;
-                image.IsMain = true;
                 _unitOfWork.SaveChanges();
+
                 return Ok(new ResponseObject(MappingToDTO(newItem)));
             }
             catch (Exception ex)
@@ -114,12 +115,10 @@ namespace BusinessCalendar.Controllers
                 }
                 var item = MappingToDomainObject(itemDTO);
                 var oldItem = _eventDAO.GetItemForUpdate(itemDTO.Id!.Value);
-                var oldMainImage = oldItem.Images.Single(x => x.IsMain); 
 
-                if (oldMainImage.Id != itemDTO.Image_Id)
+                if (item.Image_Id != oldItem.Image_Id)
                 {
-                    oldMainImage.IsMain = false;
-                    item.Images.Single(x => x.Id == itemDTO.Image_Id).IsMain = true;
+                    return BadRequest(new ResponseObject("It is forbidden to change the main image"));
                 }
 
                 SetValues(item, oldItem);
@@ -138,15 +137,15 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                var delEvent = _eventDAO.GetById(id);
+                var delImages = _imageDAO.GetAllPathsByEventId(id);
                 _eventDAO.Delete(id);
                 _unitOfWork.SaveChanges();
 
-                foreach (var img in delEvent.Images)
+                foreach (var imgPath in delImages)
                 {
-                    ImageFileHelper.DeleteImageFile(img.Name);
+                    ImageFileHelper.DeleteImageFile(imgPath);
                 }
-                
+
                 return Ok(new ResponseObject(id));
             }
             catch (Exception ex)
@@ -203,7 +202,8 @@ namespace BusinessCalendar.Controllers
                         itemDTO.Address!,
                         itemDTO.EventDate!.Value,
                         itemDTO.EventDuration!.Value,
-                        itemDTO.Id.HasValue ? _imageDAO.GetAllByEventId(itemDTO.Id.Value) : new HashSet<Image>()
+                        _imageDAO.GetById(itemDTO.Image_Id!.Value),
+                        itemDTO.Id.HasValue ? _imageDAO.GetSubImagesByEventId(itemDTO.Id.Value).ToList() : new List<Image>()
                     )
             {
                 Id = itemDTO.Id ?? 0
@@ -212,7 +212,6 @@ namespace BusinessCalendar.Controllers
 
         private EventDTO MappingToDTO(Event item)
         {
-            var mainImg = item.Images.Single(x => x.IsMain);
             return new EventDTO()
             {
                 Id = item.Id,
@@ -221,8 +220,8 @@ namespace BusinessCalendar.Controllers
                 Address = item.Address,
                 EventDate = item.EventDate,
                 EventDuration = item.EventDuration,
-                Image_Id = mainImg.Id,
-                ImageName = mainImg.Name
+                Image_Id = item.Image!.Id,
+                ImageName = item.Image!.Name
             };
         }
     }

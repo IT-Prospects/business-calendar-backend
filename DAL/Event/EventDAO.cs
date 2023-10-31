@@ -20,13 +20,42 @@ namespace DAL
         protected DbSet<Event> DbSet;
 
         protected IQueryable<Event> DbSetView =>
-            DbSet.Include(x => x.Images);
+            from ev in _unitOfWork.DbSet<Event>()
+            join mainImg in _unitOfWork.DbSet<Image>() on ev.Image_Id equals mainImg.Id
+            join img in _unitOfWork.DbSet<Image>() on ev.Id equals img.Event_Id into subImg
+            select new Event
+            {
+                Id = ev.Id,
+                Title = ev.Title,
+                Description = ev.Description,
+                Address = ev.Address,
+                EventDate = ev.EventDate,
+                EventDuration = ev.EventDuration,
+                Image = mainImg,
+                Image_Id = mainImg.Id,
+                SubImages = subImg.Where(x => x.Id != ev.Image_Id)
+                    .Select(x => new Image { Id = x.Id, Name = x.Name, Event = ev, Event_Id = ev.Id }).ToList(),
+            };
 
         public Event GetById(long id)
         {
             try
             {
-                return DbSetView.Single(x => x.Id == id);
+                var item = DbSetView.Single(x => x.Id == id);
+                return item;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
+            }
+        }
+
+        public Event GetFlatItemById(long id)
+        {
+            try
+            {
+                var item = DbSet.Single(x => x.Id == id);
+                return item;
             }
             catch (Exception ex)
             {
@@ -38,7 +67,7 @@ namespace DAL
         {
             try
             {
-                return DbSetView;
+                return DbSetView.ToList();
             }
             catch (Exception ex)
             {
@@ -74,6 +103,7 @@ namespace DAL
         {
             var item = new Event();
             DbSet.Add(item);
+
             return item;
         }
 
@@ -85,7 +115,9 @@ namespace DAL
 
         public void Delete(long id)
         {
-            DbSet.Remove(GetById(id));
+            DbSet.Remove(GetFlatItemById(id));
         }
+
+
     }
 }

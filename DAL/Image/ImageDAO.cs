@@ -18,7 +18,7 @@ namespace DAL
 
         protected DbSet<Image> DbSet;
 
-        protected IQueryable<Image> DbSetView => DbSet;
+        protected IQueryable<Image> DbSetView => DbSet.Include(x => x.Event);
 
         public Image GetById(long id)
         {
@@ -32,11 +32,13 @@ namespace DAL
             }
         }
 
-        public Image GetByName(string name)
+        public IEnumerable<Image> GetSubImagesByEventId(long event_Id)
         {
             try
             {
-                return DbSet.Single(x => x.Name == name);
+                return (from img in DbSetView
+                        where img.Event_Id == event_Id && img.Event.Image_Id != img.Id
+                        select img).ToList();
             }
             catch (Exception ex)
             {
@@ -44,35 +46,11 @@ namespace DAL
             }
         }
 
-        public ICollection<Image> GetAllByEventId(long event_Id)
+        public IEnumerable<string> GetAllPathsByEventId(long event_Id)
         {
             try
             {
-                return DbSet.Where(x => x.Event_Id == event_Id).ToHashSet();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
-            }
-        }
-
-        public ICollection<Image> GetAdditionalByEventId(long event_Id)
-        {
-            try
-            {
-                return DbSet.Where(x => x.Event_Id == event_Id && !x.IsMain).ToHashSet();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
-            }
-        }
-
-        public Image GetMainByEventId(long event_Id)
-        {
-            try
-            {
-                return DbSet.Single(x => x.Event_Id == event_Id && x.IsMain);
+                return DbSet.Where(x => x.Event_Id == event_Id).Select(x => x.Name).ToList();
             }
             catch (Exception ex)
             {

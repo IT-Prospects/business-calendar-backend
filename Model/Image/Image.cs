@@ -6,9 +6,8 @@
 
         public string Name { get; set; }
 
-        public bool IsMain { get; set; }
-
         public Event? Event { get; set; }
+
         public long? Event_Id { get; set; }
 
         #endregion
@@ -18,15 +17,13 @@
         public Image() 
         {
             Name = string.Empty;
-            IsMain = false;
             Event = null;
             Event_Id = null;
         }
 
-        public Image(string name, bool isMain, Event? ev)
+        public Image(string name, Event? ev)
         {
             Name = name;
-            IsMain = isMain;
             Event = ev;
             Event_Id = ev?.Id;
         }
