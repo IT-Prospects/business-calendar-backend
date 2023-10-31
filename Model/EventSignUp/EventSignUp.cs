@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Model
+﻿namespace Model
 {
     public class EventSignUp : DomainObject
     {
@@ -20,7 +14,7 @@ namespace Model
 
         public string PhoneNumber { get; set; }
 
-        public Event? Event { get; set; }
+        public Event Event { get; set; }
 
         public long Event_Id { get; set; }
 
@@ -35,7 +29,7 @@ namespace Model
             Patronymic = null;
             Email = string.Empty;
             PhoneNumber = string.Empty;
-            Event = null;
+            Event = new Event();
             Event_Id = 0;
         }
 

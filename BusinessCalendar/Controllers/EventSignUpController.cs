@@ -27,47 +27,23 @@ namespace BusinessCalendar.Controllers
             _eventDAO = new EventDAO(uow);
         }
 
-        [HttpGet]
-        [Route("event_id={event_Id}")]
-        public IActionResult GetByEventId(long event_Id)
-        {
-            try
-            {
-                var result = _eventSignUpDAO.GetAllByEvent(event_Id).Select(MappingToDTO);
-                return Ok(new ResponseObject(result));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
-            }
-        }
-
-        [HttpGet]
-        [Route("id={id}")]
-        public IActionResult Get(long id)
-        {
-            try
-            {
-                return Ok(new ResponseObject(MappingToDTO(_eventSignUpDAO.GetById(id))));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
-            }
-        }
-
         [HttpPost]
         [Route("")]
         public IActionResult Post(EventSignUpDTO itemDTO)
         {
             try
             {
-                if (!IsValidDTO(itemDTO, ControllerAction.Create, out var message))
+                if (!IsValidDTO(itemDTO, out var message))
                 {
                     return BadRequest(new ResponseObject(message));
                 }
                 var item = MappingToDomainObject(itemDTO);
                 
+                var ev = _eventDAO.GetFlatItemById(item.Event_Id!);
+                if (ev.EventDate < DateTime.UtcNow)
+                {
+                    throw new Exception("It is forbidden to register for an event that has already taken place");
+                }
                 var newItem = _eventSignUpDAO.Create();
                 SetValues(item, newItem);
                 _unitOfWork.SaveChanges();
@@ -101,7 +77,7 @@ namespace BusinessCalendar.Controllers
             _unitOfWork.Context().Entry(dst).CurrentValues.SetValues(src);
         }
 
-        private bool IsValidDTO(EventSignUpDTO item, ControllerAction controllerAction, out string message)
+        private bool IsValidDTO(EventSignUpDTO item, out string message)
         {
             var stringBuilder = new StringBuilder(string.Empty);
             const string requiredFieldErrorMessageTemplate = "Required field \"{0}\" is not filled in";

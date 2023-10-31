@@ -1,12 +1,6 @@
 ﻿using DAL.Common;
-using DAL.Params;
 using Microsoft.EntityFrameworkCore;
 using Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DAL
 {
@@ -39,34 +33,11 @@ namespace DAL
             }
         }
 
-        public IEnumerable<EventSignUp> GetAll()
-        {
-            try
-            {
-                return DbSetView;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
-            }
-        }
-
-        public IEnumerable<EventSignUp> GetAllByEvent(long event_Id)
-        {
-            try
-            {
-                return DbSetView.Where(x => x.Event_Id == event_Id);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
-            }
-        }
-
         public EventSignUp Create()
         {
             var item = new EventSignUp();
-            DbSet.Add(item);
+            DbSet.Add(item); 
+            _unitOfWork.Context().Entry(item.Event).State = EntityState.Detached;
             return item;
         }
 
