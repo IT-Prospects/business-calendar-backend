@@ -37,7 +37,7 @@ namespace DAL
             try
             {
                 return (from img in DbSetView
-                        where img.Event_Id == event_Id && img.Event.Image_Id != img.Id
+                        where img.Event_Id == event_Id && img.Event != null && img.Event.Image_Id != img.Id
                         select img).ToList();
             }
             catch (Exception ex)
