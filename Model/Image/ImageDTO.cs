@@ -6,8 +6,6 @@
 
         public string? Name { get; set; }
 
-        public bool? IsMain { get; set; }
-
         public long? Event_Id { get; set; }
 
     }
