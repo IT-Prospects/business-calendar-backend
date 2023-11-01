@@ -10,7 +10,7 @@ using Model.DTO;
 namespace BusinessCalendar.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class ImageController : Controller
     {
         private readonly ILogger<ImageController> _logger;

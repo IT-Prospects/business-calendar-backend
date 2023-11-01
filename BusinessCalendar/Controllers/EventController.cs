@@ -12,7 +12,7 @@ using System.Text;
 namespace BusinessCalendar.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class EventController : Controller
     {
         private readonly ILogger<EventController> _logger;
