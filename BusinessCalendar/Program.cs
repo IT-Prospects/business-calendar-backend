@@ -26,10 +26,7 @@ namespace BusinessCalendar
                 options.UseNpgsql(GetConnectionString());
             });
 
-            builder.Services.AddScoped<ModelContext>(x =>
-            {
-                return new ModelContext(GetConnectionString());
-            });
+            builder.Services.AddScoped<ModelContext>(x => new ModelContext(GetConnectionString()));
 
             builder.Services.AddScoped(x => new UnitOfWork());
 

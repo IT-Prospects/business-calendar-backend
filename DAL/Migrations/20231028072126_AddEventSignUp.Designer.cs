@@ -3,6 +3,7 @@ using System;
 using DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace _2DAL.Migrations
 {
     [DbContext(typeof(ModelContext))]
-    partial class ModelContextModelSnapshot : ModelSnapshot
+    [Migration("20231028072126_AddEventSignUp")]
+    partial class AddEventSignUp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,10 +52,6 @@ namespace _2DAL.Migrations
                         .HasColumnType("interval")
                         .HasColumnName("eventduration");
 
-                    b.Property<long>("Image_Id")
-                        .HasColumnType("bigint")
-                        .HasColumnName("image_id");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text")
@@ -60,9 +59,6 @@ namespace _2DAL.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_eventset");
-
-                    b.HasIndex("Image_Id")
-                        .IsUnique();
 
                     b.ToTable("eventset", (string)null);
                 });
@@ -125,6 +121,10 @@ namespace _2DAL.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("event_id");
 
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("boolean")
+                        .HasColumnName("ismain");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
@@ -139,18 +139,6 @@ namespace _2DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("imageset", (string)null);
-                });
-
-            modelBuilder.Entity("Model.Event", b =>
-                {
-                    b.HasOne("Model.Image", "Image")
-                        .WithOne()
-                        .HasForeignKey("Model.Event", "Image_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_event_image");
-
-                    b.Navigation("Image");
                 });
 
             modelBuilder.Entity("Model.EventSignUp", b =>
@@ -168,17 +156,17 @@ namespace _2DAL.Migrations
             modelBuilder.Entity("Model.Image", b =>
                 {
                     b.HasOne("Model.Event", "Event")
-                        .WithMany("SubImages")
+                        .WithMany("Images")
                         .HasForeignKey("Event_Id")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("fk_image_event");
+                        .HasConstraintName("fk_event_image");
 
                     b.Navigation("Event");
                 });
 
             modelBuilder.Entity("Model.Event", b =>
                 {
-                    b.Navigation("SubImages");
+                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

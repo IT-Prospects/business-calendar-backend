@@ -6,7 +6,9 @@ namespace DAL
 {
     public class ImageDAO
     {
-        private UnitOfWork _unitOfWork;
+        private const string _errorReceiveObject = "Error when receiving an object {0}";
+
+        private readonly UnitOfWork _unitOfWork;
 
         public ImageDAO(UnitOfWork uow)
         {
@@ -16,9 +18,9 @@ namespace DAL
 
         protected DbSet<Image> DbSet;
 
-        protected IQueryable<Image> DbSetView => DbSet;
+        protected IQueryable<Image> DbSetView => DbSet.Include(x => x.Event);
 
-        public virtual Image GetById(long id)
+        public Image GetById(long id)
         {
             try
             {
@@ -26,30 +28,50 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при получении объекта {DbSet.GetType()}", ex);
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
             }
         }
 
-        public virtual Image GetByName(string name)
+        public IEnumerable<Image> GetSubImagesByEventId(long event_Id)
         {
             try
             {
-                return DbSet.Single(x => x.Name == name);
+                return (from img in DbSetView
+                        where img.Event_Id == event_Id && img.Event != null && img.Event.Image_Id != img.Id
+                        select img).ToList();
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при получении объекта {DbSet.GetType()}", ex);
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
             }
         }
 
-        public virtual Image Create()
+        public IEnumerable<string> GetAllPathsByEventId(long event_Id)
+        {
+            try
+            {
+                return DbSet.Where(x => x.Event_Id == event_Id).Select(x => x.Name).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
+            }
+        }
+
+        public Image Create()
         {
             var item = new Image();
             DbSet.Add(item);
             return item;
         }
 
-        public virtual void Delete(long id)
+        public Image GetItemForUpdate(long id)
+        {
+            var item = DbSet.Local.SingleOrDefault(x => x.Id == id);
+            return (item = DbSet.Single(x => x.Id == id));
+        }
+
+        public void Delete(long id)
         {
             DbSet.Remove(GetById(id));
         }

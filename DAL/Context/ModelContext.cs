@@ -6,28 +6,26 @@ namespace DAL.Context
 {
     public class ModelContext : DbContext
     {
-        protected string connectionString;
+        private readonly string _connectionString;
 
         public ModelContext(string connectionString) : base()
         {
-            this.connectionString = connectionString;
+            this._connectionString = connectionString;
         }
 
         public ModelContext(DbContextOptions<ModelContext> options)
             : base(options)
         {
-            connectionString = string.Empty;
+            _connectionString = string.Empty;
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder OptionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!OptionsBuilder.IsConfigured)
-            {
-                OptionsBuilder.UseNpgsql(connectionString);
+            if (optionsBuilder.IsConfigured) return;
+            optionsBuilder.UseNpgsql(_connectionString);
 #if DEBUG
-                OptionsBuilder.LogTo(x => System.Diagnostics.Debug.Write(x));
+            optionsBuilder.LogTo(x => System.Diagnostics.Debug.Write(x));
 #endif
-            }
         }
 
         public IEnumerable<EntityEntry> GetAllObjectStateEntries()
@@ -58,7 +56,7 @@ namespace DAL.Context
             }
             catch (Exception ex)
             {
-                throw new ApplicationException("Ошибка при очистке контекста.", ex);
+                throw new ApplicationException("Error clearing context.", ex);
             }
         }
 
@@ -71,5 +69,6 @@ namespace DAL.Context
 
         public DbSet<Event> EventSet { get; set; }
         public DbSet<Image> ImageSet { get; set; }
+        public DbSet<EventSignUp> EventSignUpSet { get; set; }
     }
 }

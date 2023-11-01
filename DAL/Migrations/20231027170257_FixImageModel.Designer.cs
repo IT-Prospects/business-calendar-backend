@@ -3,6 +3,7 @@ using System;
 using DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace _2DAL.Migrations
 {
     [DbContext(typeof(ModelContext))]
-    partial class ModelContextModelSnapshot : ModelSnapshot
+    [Migration("20231027170257_FixImageModel")]
+    partial class FixImageModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,10 +52,6 @@ namespace _2DAL.Migrations
                         .HasColumnType("interval")
                         .HasColumnName("eventduration");
 
-                    b.Property<long>("Image_Id")
-                        .HasColumnType("bigint")
-                        .HasColumnName("image_id");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text")
@@ -61,55 +60,7 @@ namespace _2DAL.Migrations
                     b.HasKey("Id")
                         .HasName("pk_eventset");
 
-                    b.HasIndex("Image_Id")
-                        .IsUnique();
-
                     b.ToTable("eventset", (string)null);
-                });
-
-            modelBuilder.Entity("Model.EventSignUp", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("email");
-
-                    b.Property<long>("Event_Id")
-                        .HasColumnType("bigint")
-                        .HasColumnName("event_id");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("firstname");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("lastname");
-
-                    b.Property<string>("Patronymic")
-                        .HasColumnType("text")
-                        .HasColumnName("patronymic");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("phonenumber");
-
-                    b.HasKey("Id")
-                        .HasName("pk_eventsignupset");
-
-                    b.HasIndex("Event_Id");
-
-                    b.ToTable("eventsignupset", (string)null);
                 });
 
             modelBuilder.Entity("Model.Image", b =>
@@ -124,6 +75,10 @@ namespace _2DAL.Migrations
                     b.Property<long?>("Event_Id")
                         .HasColumnType("bigint")
                         .HasColumnName("event_id");
+
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("boolean")
+                        .HasColumnName("ismain");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -141,44 +96,20 @@ namespace _2DAL.Migrations
                     b.ToTable("imageset", (string)null);
                 });
 
-            modelBuilder.Entity("Model.Event", b =>
-                {
-                    b.HasOne("Model.Image", "Image")
-                        .WithOne()
-                        .HasForeignKey("Model.Event", "Image_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_event_image");
-
-                    b.Navigation("Image");
-                });
-
-            modelBuilder.Entity("Model.EventSignUp", b =>
-                {
-                    b.HasOne("Model.Event", "Event")
-                        .WithMany()
-                        .HasForeignKey("Event_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_eventsignup_event");
-
-                    b.Navigation("Event");
-                });
-
             modelBuilder.Entity("Model.Image", b =>
                 {
                     b.HasOne("Model.Event", "Event")
-                        .WithMany("SubImages")
+                        .WithMany("Images")
                         .HasForeignKey("Event_Id")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("fk_image_event");
+                        .HasConstraintName("fk_event_image");
 
                     b.Navigation("Event");
                 });
 
             modelBuilder.Entity("Model.Event", b =>
                 {
-                    b.Navigation("SubImages");
+                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

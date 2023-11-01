@@ -3,13 +3,10 @@ using BusinessCalendar.Helpers;
 using DAL;
 using DAL.Common;
 using DAL.Params;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using Model.DTO;
 using Model.Enum;
-using System.ComponentModel;
-using System.Reflection;
 using System.Text;
 
 namespace BusinessCalendar.Controllers
@@ -83,14 +80,21 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                if (!IsValidDTO(itemDTO, ControllerAction.Create, out string message))
+                if (!IsValidDTO(itemDTO, ControllerAction.Create, out var message))
                 {
                     return BadRequest(new ResponseObject(message));
                 }
+                var image = _imageDAO.GetItemForUpdate(itemDTO.Image_Id!.Value);
                 var item = MappingToDomainObject(itemDTO);
+                item.Image = image;
+
                 var newItem = _eventDAO.Create();
                 SetValues(item, newItem);
                 _unitOfWork.SaveChanges();
+
+                image.Event = newItem;
+                _unitOfWork.SaveChanges();
+
                 return Ok(new ResponseObject(MappingToDTO(newItem)));
             }
             catch (Exception ex)
@@ -105,12 +109,18 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                if (!IsValidDTO(itemDTO, ControllerAction.Update, out string message))
+                if (!IsValidDTO(itemDTO, ControllerAction.Update, out var message))
                 {
                     return BadRequest(new ResponseObject(message));
                 }
                 var item = MappingToDomainObject(itemDTO);
                 var oldItem = _eventDAO.GetItemForUpdate(itemDTO.Id!.Value);
+
+                if (item.Image_Id != oldItem.Image_Id)
+                {
+                    return BadRequest(new ResponseObject("It is forbidden to change the main image"));
+                }
+
                 SetValues(item, oldItem);
                 _unitOfWork.SaveChanges();
                 return Ok(new ResponseObject(MappingToDTO(oldItem)));
@@ -127,11 +137,15 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                var delEvent = _eventDAO.GetById(id);
+                var delImages = _imageDAO.GetAllPathsByEventId(id);
                 _eventDAO.Delete(id);
-                _imageDAO.Delete(delEvent.Image_Id);
                 _unitOfWork.SaveChanges();
-                ImageFileHelper.DeleteImageFile(delEvent.Image!.Name);
+
+                foreach (var imgPath in delImages)
+                {
+                    ImageFileHelper.DeleteImageFile(imgPath);
+                }
+
                 return Ok(new ResponseObject(id));
             }
             catch (Exception ex)
@@ -147,14 +161,14 @@ namespace BusinessCalendar.Controllers
 
         private bool IsValidDTO(EventDTO item, ControllerAction controllerAction, out string message)
         {
-            if (controllerAction == ControllerAction.Update && (!item.Id.HasValue || item.Id.Value == 0))
+            if (controllerAction == ControllerAction.Update && item.Id is null or 0)
             {
                 message = "Event ID is missing";
                 return false;
             }
 
             var stringBuilder = new StringBuilder(string.Empty);
-            var requiredFieldErrorMessageTemplate = "Required field \"{0}\" is not filled in";
+            const string requiredFieldErrorMessageTemplate = "Required field \"{0}\" is not filled in";
 
             if (string.IsNullOrWhiteSpace(item.Title))
                 stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(item.Title)));
@@ -181,7 +195,6 @@ namespace BusinessCalendar.Controllers
 
         private Event MappingToDomainObject(EventDTO itemDTO)
         {
-            var image = _imageDAO.GetById(itemDTO.Image_Id!.Value);
             return new Event
                     (
                         itemDTO.Title!,
@@ -189,7 +202,8 @@ namespace BusinessCalendar.Controllers
                         itemDTO.Address!,
                         itemDTO.EventDate!.Value,
                         itemDTO.EventDuration!.Value,
-                        image
+                        _imageDAO.GetById(itemDTO.Image_Id!.Value),
+                        itemDTO.Id.HasValue ? _imageDAO.GetSubImagesByEventId(itemDTO.Id.Value).ToList() : new List<Image>()
                     )
             {
                 Id = itemDTO.Id ?? 0

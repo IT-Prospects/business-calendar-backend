@@ -1,8 +1,4 @@
-﻿using Model.DTO;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-
-namespace Model
+﻿namespace Model
 {
     public class Event : DomainObject
     {
@@ -22,6 +18,8 @@ namespace Model
 
         public long Image_Id { get; set; }
 
+        public List<Image> SubImages { get; set; }
+
         #endregion
 
         #region ctors
@@ -35,6 +33,7 @@ namespace Model
             EventDuration = TimeSpan.Zero;
             Image = null;
             Image_Id = 0;
+            SubImages = new List<Image>();
         }
 
         public Event(
@@ -43,7 +42,8 @@ namespace Model
             string address,
             DateTime eventDate,
             TimeSpan eventDuration,
-            Image image
+            Image image,
+            List<Image> subImages
             )
         {
             Title = title;
@@ -53,6 +53,7 @@ namespace Model
             EventDuration = eventDuration;
             Image = image;
             Image_Id = image.Id;
+            SubImages = subImages;
         }
 
         #endregion

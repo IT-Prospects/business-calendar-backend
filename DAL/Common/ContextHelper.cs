@@ -12,7 +12,10 @@ namespace DAL.Common
                 Port = port,
                 Database = database,
                 Username = username,
-                Password = password
+                Password = password,
+#if DEBUG
+                IncludeErrorDetail = true
+#endif
             };
             return builder.ToString();
         }

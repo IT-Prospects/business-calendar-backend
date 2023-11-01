@@ -1,12 +1,7 @@
 ﻿using DAL.Common;
 using DAL.Params;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Model;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DAL
 {
@@ -14,7 +9,7 @@ namespace DAL
     {
         private const string _errorReceiveObject = "Error when receiving an object {0}";
 
-        private UnitOfWork _unitOfWork;
+        private readonly UnitOfWork _unitOfWork;
 
         public EventDAO(UnitOfWork uow)
         {
@@ -25,8 +20,9 @@ namespace DAL
         protected DbSet<Event> DbSet;
 
         protected IQueryable<Event> DbSetView =>
-            from ev in DbSet
-            join img in _unitOfWork.DbSet<Image>() on ev.Image_Id equals img.Id
+            from ev in _unitOfWork.DbSet<Event>()
+            join mainImg in _unitOfWork.DbSet<Image>() on ev.Image_Id equals mainImg.Id
+            join img in _unitOfWork.DbSet<Image>() on ev.Id equals img.Event_Id into subImg
             select new Event
             {
                 Id = ev.Id,
@@ -35,15 +31,18 @@ namespace DAL
                 Address = ev.Address,
                 EventDate = ev.EventDate,
                 EventDuration = ev.EventDuration,
-                Image = img,
-                Image_Id = img.Id,
+                Image = mainImg,
+                Image_Id = mainImg.Id,
+                SubImages = subImg.Where(x => x.Id != ev.Image_Id)
+                    .Select(x => new Image { Id = x.Id, Name = x.Name, Event = ev, Event_Id = ev.Id }).ToList(),
             };
 
-        public virtual Event GetById(long id)
+        public Event GetById(long id)
         {
             try
             {
-                return DbSetView.Single(x => x.Id == id);
+                var item = DbSetView.Single(x => x.Id == id);
+                return item;
             }
             catch (Exception ex)
             {
@@ -51,11 +50,12 @@ namespace DAL
             }
         }
 
-        public virtual IEnumerable<Event> GetAll()
+        public Event GetFlatItemById(long id)
         {
             try
             {
-                return DbSetView;
+                var item = DbSet.Single(x => x.Id == id);
+                return item;
             }
             catch (Exception ex)
             {
@@ -63,7 +63,19 @@ namespace DAL
             }
         }
 
-        public virtual IEnumerable<Event> GetAnnounceEvents(EventAnnouncementParam param)
+        public IEnumerable<Event> GetAll()
+        {
+            try
+            {
+                return DbSetView.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
+            }
+        }
+
+        public IEnumerable<Event> GetAnnounceEvents(EventAnnouncementParam param)
         {
             try
             {
@@ -75,7 +87,7 @@ namespace DAL
             }
         }
 
-        public virtual IEnumerable<Event> GetEventsByDate(EventFilterParam param)
+        public IEnumerable<Event> GetEventsByDate(EventFilterParam param)
         {
             try
             {
@@ -87,22 +99,25 @@ namespace DAL
             }
         }
 
-        public virtual Event Create()
+        public Event Create()
         {
             var item = new Event();
             DbSet.Add(item);
+
             return item;
         }
 
-        public virtual Event GetItemForUpdate(long id)
+        public Event GetItemForUpdate(long id)
         {
             var item = DbSet.Local.SingleOrDefault(x => x.Id == id);
             return (item = DbSet.Single(x => x.Id == id));
         }
 
-        public virtual void Delete(long id)
+        public void Delete(long id)
         {
-            DbSet.Remove(GetById(id));
+            DbSet.Remove(GetFlatItemById(id));
         }
+
+
     }
 }
