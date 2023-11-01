@@ -26,6 +26,21 @@ namespace BusinessCalendar.Controllers
             _unitOfWork = uow;
         }
 
+        [HttpGet]
+        [Route("event_id={event_Id}")]
+        public IActionResult GetAdditionalImageByEventId(long event_Id)
+        {
+            try
+            {
+                var result = _imageDAO.GetSubImagesByEventId(event_Id);
+                return Ok(new ResponseObject(result.Select(MappingToDTO)));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
+        }
+
         [HttpPost]
         public IActionResult Post(IFormFile formFile)
         {
