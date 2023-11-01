@@ -37,7 +37,6 @@ namespace DAL
         {
             var item = new EventSignUp();
             DbSet.Add(item); 
-            _unitOfWork.Context().Entry(item.Event).State = EntityState.Detached;
             return item;
         }
 

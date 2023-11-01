@@ -14,7 +14,7 @@
 
         public string PhoneNumber { get; set; }
 
-        public Event Event { get; set; }
+        public Event? Event { get; set; }
 
         public long Event_Id { get; set; }
 
@@ -29,7 +29,7 @@
             Patronymic = null;
             Email = string.Empty;
             PhoneNumber = string.Empty;
-            Event = new Event();
+            Event = null;
             Event_Id = 0;
         }
 

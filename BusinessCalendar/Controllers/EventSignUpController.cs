@@ -39,8 +39,7 @@ namespace BusinessCalendar.Controllers
                 }
                 var item = MappingToDomainObject(itemDTO);
                 
-                var ev = _eventDAO.GetFlatItemById(item.Event_Id!);
-                if (ev.EventDate < DateTime.UtcNow)
+                if (item.Event!.EventDate < DateTime.UtcNow)
                 {
                     throw new Exception("It is forbidden to register for an event that has already taken place");
                 }
