@@ -115,7 +115,7 @@ namespace BusinessCalendar.Controllers
                 }
                 var item = MappingToDomainObject(itemDTO);
                 var oldItem = _eventDAO.GetItemForUpdate(itemDTO.Id!.Value);
-
+                item.ArchivePassword = oldItem.ArchivePassword;
                 if (item.Image_Id != oldItem.Image_Id)
                 {
                     return BadRequest(new ResponseObject("It is forbidden to change the main image"));
@@ -195,6 +195,7 @@ namespace BusinessCalendar.Controllers
 
         private Event MappingToDomainObject(EventDTO itemDTO)
         {
+            var rand = new Random((int)DateTime.Now.Ticks);
             return new Event
                     (
                         itemDTO.Title!,
@@ -202,6 +203,7 @@ namespace BusinessCalendar.Controllers
                         itemDTO.Address!,
                         itemDTO.EventDate!.Value,
                         itemDTO.EventDuration!.Value,
+                        itemDTO.Id != null ? string.Empty : string.Join(string.Empty, new char[12].Select(x => (char)rand.Next(0x0021, 0x007E))),
                         _imageDAO.GetById(itemDTO.Image_Id!.Value),
                         itemDTO.Id.HasValue ? _imageDAO.GetSubImagesByEventId(itemDTO.Id.Value).ToList() : new List<Image>()
                     )
@@ -220,6 +222,7 @@ namespace BusinessCalendar.Controllers
                 Address = item.Address,
                 EventDate = item.EventDate,
                 EventDuration = item.EventDuration,
+                ArchivePassword = item.ArchivePassword,
                 Image_Id = item.Image!.Id,
                 ImageName = item.Image!.Name
             };
