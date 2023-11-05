@@ -49,37 +49,32 @@ namespace BusinessCalendar.Helpers
         {
             var cell = ws.Cell(row, column);
 
-            if (obj is string stringObj)
+            switch (obj)
             {
-                cell.SetValue(stringObj);
-            }
-            else if (obj is int intObj)
-            {
-                cell.SetValue(intObj);
-            }
-            else if (obj is double doubleObj)
-            {
-                cell.SetValue(doubleObj);
-            }
-            else if (obj is decimal decimalObj)
-            {
-                cell.SetValue(decimalObj);
-            }
-            else if (obj is float floatObj)
-            {
-                cell.SetValue(floatObj);
-            }
-            else if (obj is long)
-            {
-                cell.SetValue(obj.ToString());
-            }
-            else if (obj is DateTime dateTimeObj)
-            {
-                cell.SetValue($"{dateTimeObj:dd.MM.yyyy}");
-            }
-            else if (obj is TimeSpan timeSpanObj)
-            {
-                cell.SetValue(timeSpanObj);
+                case string stringObj:
+                    cell.SetValue(stringObj);
+                    break;
+                case int intObj:
+                    cell.SetValue(intObj);
+                    break;
+                case double doubleObj:
+                    cell.SetValue(doubleObj);
+                    break;
+                case decimal decimalObj:
+                    cell.SetValue(decimalObj);
+                    break;
+                case float floatObj:
+                    cell.SetValue(floatObj);
+                    break;
+                case long:
+                    cell.SetValue(obj.ToString());
+                    break;
+                case DateTime dateTimeObj:
+                    cell.SetValue($"{dateTimeObj:dd.MM.yyyy}");
+                    break;
+                case TimeSpan timeSpanObj:
+                    cell.SetValue(timeSpanObj);
+                    break;
             }
         }
 
