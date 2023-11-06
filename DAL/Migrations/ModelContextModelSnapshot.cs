@@ -36,11 +36,6 @@ namespace _2DAL.Migrations
                         .HasColumnType("text")
                         .HasColumnName("address");
 
-                    b.Property<string>("ArchivePassword")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("archivepassword");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text")
