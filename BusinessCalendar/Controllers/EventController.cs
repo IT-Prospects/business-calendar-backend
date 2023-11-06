@@ -84,15 +84,16 @@ namespace BusinessCalendar.Controllers
                 {
                     return BadRequest(new ResponseObject(message));
                 }
-                var image = _imageDAO.GetItemForUpdate(itemDTO.Image_Id!.Value);
                 var item = MappingToDomainObject(itemDTO);
-                item.Image = image;
+
+                var rand = new Random((int)DateTime.Now.Ticks);
+                item.ArchivePassword = string.Join(string.Empty, new char[12].Select(x => (char)rand.Next(0x0021, 0x007E)));
 
                 var newItem = _eventDAO.Create();
                 SetValues(item, newItem);
                 _unitOfWork.SaveChanges();
 
-                image.Event = newItem;
+                newItem.Image!.Event = newItem;
                 _unitOfWork.SaveChanges();
 
                 return Ok(new ResponseObject(MappingToDTO(newItem)));
@@ -195,7 +196,7 @@ namespace BusinessCalendar.Controllers
 
         private Event MappingToDomainObject(EventDTO itemDTO)
         {
-            var rand = new Random((int)DateTime.Now.Ticks);
+            
             return new Event
                     (
                         itemDTO.Title!,
@@ -203,7 +204,7 @@ namespace BusinessCalendar.Controllers
                         itemDTO.Address!,
                         itemDTO.EventDate!.Value,
                         itemDTO.EventDuration!.Value,
-                        itemDTO.Id != null ? string.Empty : string.Join(string.Empty, new char[12].Select(x => (char)rand.Next(0x0021, 0x007E))),
+                        itemDTO.ArchivePassword ?? string.Empty,
                         _imageDAO.GetById(itemDTO.Image_Id!.Value),
                         itemDTO.Id.HasValue ? _imageDAO.GetSubImagesByEventId(itemDTO.Id.Value).ToList() : new List<Image>()
                     )
