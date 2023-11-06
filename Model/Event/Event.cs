@@ -14,8 +14,6 @@
 
         public TimeSpan EventDuration { get; set; }
 
-        public string ArchivePassword { get; set; }
-
         public Image? Image { get; set; }
 
         public long Image_Id { get; set; }
@@ -33,7 +31,6 @@
             Address = string.Empty;
             EventDate = DateTime.MinValue;
             EventDuration = TimeSpan.Zero;
-            ArchivePassword = string.Empty;
             Image = null;
             Image_Id = 0;
             SubImages = new List<Image>();
@@ -45,7 +42,6 @@
             string address,
             DateTime eventDate,
             TimeSpan eventDuration,
-            string archivePassword,
             Image image,
             List<Image> subImages
             )
@@ -55,7 +51,6 @@
             Address = address;
             EventDate = eventDate;
             EventDuration = eventDuration;
-            ArchivePassword = archivePassword;
             Image = image;
             Image_Id = image.Id;
             SubImages = subImages;
