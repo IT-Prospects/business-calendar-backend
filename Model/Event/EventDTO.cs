@@ -14,6 +14,8 @@
 
         public TimeSpan? EventDuration { get; set; }
 
+        public string? ArchivePassword { get; set; }
+
         public long? Image_Id { get; set; }
 
         public string? ImageName { get; set; }
