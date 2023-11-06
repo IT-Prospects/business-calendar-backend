@@ -33,6 +33,18 @@ namespace DAL
             }
         }
 
+        public IEnumerable<EventSignUp> GetByEventId(long event_Id)
+        {
+            try
+            {
+                return DbSetView.Where(x => x.Event_Id == event_Id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
+            }
+        }
+
         public EventSignUp Create()
         {
             var item = new EventSignUp();

@@ -84,15 +84,16 @@ namespace BusinessCalendar.Controllers
                 {
                     return BadRequest(new ResponseObject(message));
                 }
-                var image = _imageDAO.GetItemForUpdate(itemDTO.Image_Id!.Value);
                 var item = MappingToDomainObject(itemDTO);
-                item.Image = image;
+
+                var rand = new Random((int)DateTime.Now.Ticks);
+                item.ArchivePassword = string.Join(string.Empty, new char[12].Select(x => (char)rand.Next(0x0021, 0x007E)));
 
                 var newItem = _eventDAO.Create();
                 SetValues(item, newItem);
                 _unitOfWork.SaveChanges();
 
-                image.Event = newItem;
+                newItem.Image!.Event = newItem;
                 _unitOfWork.SaveChanges();
 
                 return Ok(new ResponseObject(MappingToDTO(newItem)));
@@ -115,7 +116,7 @@ namespace BusinessCalendar.Controllers
                 }
                 var item = MappingToDomainObject(itemDTO);
                 var oldItem = _eventDAO.GetItemForUpdate(itemDTO.Id!.Value);
-
+                item.ArchivePassword = oldItem.ArchivePassword;
                 if (item.Image_Id != oldItem.Image_Id)
                 {
                     return BadRequest(new ResponseObject("It is forbidden to change the main image"));
@@ -195,6 +196,7 @@ namespace BusinessCalendar.Controllers
 
         private Event MappingToDomainObject(EventDTO itemDTO)
         {
+            
             return new Event
                     (
                         itemDTO.Title!,
@@ -202,6 +204,7 @@ namespace BusinessCalendar.Controllers
                         itemDTO.Address!,
                         itemDTO.EventDate!.Value,
                         itemDTO.EventDuration!.Value,
+                        itemDTO.ArchivePassword ?? string.Empty,
                         _imageDAO.GetById(itemDTO.Image_Id!.Value),
                         itemDTO.Id.HasValue ? _imageDAO.GetSubImagesByEventId(itemDTO.Id.Value).ToList() : new List<Image>()
                     )
@@ -220,6 +223,7 @@ namespace BusinessCalendar.Controllers
                 Address = item.Address,
                 EventDate = item.EventDate,
                 EventDuration = item.EventDuration,
+                ArchivePassword = item.ArchivePassword,
                 Image_Id = item.Image!.Id,
                 ImageName = item.Image!.Name
             };
