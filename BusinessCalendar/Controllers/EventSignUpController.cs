@@ -8,8 +8,8 @@ using Model;
 using System.Text;
 using ClosedXML.Excel;
 using ICSharpCode.SharpZipLib.Zip;
-using Model.Consts;
 using ICSharpCode.SharpZipLib.Core;
+using BusinessCalendar.ExcelReports;
 
 namespace BusinessCalendar.Controllers
 {
@@ -91,7 +91,7 @@ namespace BusinessCalendar.Controllers
 
                 return File(bytes,
                     System.Net.Mime.MediaTypeNames.Application.Octet,
-                    $"Report_{eventSignUps[0].Event!.Title}_{DateTime.Now:dd.MM.yyyy_HH:mm:SSzz}.zip");
+                    $"Report_{eventSignUps[0].Event!.Title}_{DateTime.Now:dd.MM.yyyy_HH:mm:sszz}.zip");
             }
             catch (Exception ex)
             {
@@ -103,7 +103,7 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                using var workbook = ExcelHelper.LoadTemplate(ExcelTemplateConsts.EventSignUpsTemplate);
+                using var workbook = EventSignUpReport.LoadTemplate();
                 var sheet = ExcelHelper.GetSheet(workbook, 1);
 
                 var cells = new object[eventSignUps.Count, 3];
@@ -128,42 +128,37 @@ namespace BusinessCalendar.Controllers
 
         private byte[] GetReportArchive(IReadOnlyList<EventSignUp> eventSignUps)
         {
-            var tempArchivePath = $"temp_{Guid.NewGuid()}.zip";
             try
             {
                 using var excelStream = new MemoryStream();
                 GetReportExcel(eventSignUps, excelStream);
 
-                using var fileStream = System.IO.File.Create(tempArchivePath);
-                using var zipFileStream = new ZipOutputStream(fileStream);
+                using var zipStream = new MemoryStream();
+                using var zipOutputStream = new ZipOutputStream(zipStream);
 
                 var ev = eventSignUps[0].Event!;
-                zipFileStream.SetLevel(9);
-                zipFileStream.Password = ev.ArchivePassword;
+                zipOutputStream.SetLevel(9);
+                zipOutputStream.Password = ev.ArchivePassword;
 
                 var entry = new ZipEntry($"{ev.Title}.xlsx");
                 entry.DateTime = DateTime.Now;
-                zipFileStream.PutNextEntry(entry);
+                zipOutputStream.PutNextEntry(entry);
 
                 excelStream.Seek(0, SeekOrigin.Begin);
-                StreamUtils.Copy(excelStream, zipFileStream, new byte[4096]);
+                StreamUtils.Copy(excelStream, zipOutputStream, new byte[4096]);
 
-                zipFileStream.IsStreamOwner = true;
-                zipFileStream.Finish();
+                zipOutputStream.IsStreamOwner = true;
+                zipOutputStream.Finish();
 
-                fileStream.Seek(0, SeekOrigin.Begin);
-                var bytes = new byte[fileStream.Length];
-                fileStream.Read(bytes, 0, (int)fileStream.Length);
+                zipStream.Seek(0, SeekOrigin.Begin);
+                var bytes = new byte[zipStream.Length];
+                zipStream.Read(bytes, 0, (int)zipStream.Length);
 
                 return bytes;
             }
             catch (Exception ex)
             {
                 throw new Exception("An error occurred when forming the ZIP file.", ex);
-            }
-            finally
-            {
-                System.IO.File.Delete(tempArchivePath);
             }
         }
 

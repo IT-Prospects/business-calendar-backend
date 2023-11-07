@@ -13,11 +13,6 @@ namespace BusinessCalendar.Helpers
             excel.SaveAs(stream);
         }
 
-        public static IXLWorkbook LoadTemplate(string templateName)
-        {
-            return new XLWorkbook(Path.Combine(_templatesPath, templateName));
-        }
-
         public static IXLWorksheet GetSheet(IXLWorkbook wb, int number) 
             => wb.Worksheet(number);
         public static void SetSheetName(IXLWorksheet ws, string name) 
@@ -89,5 +84,9 @@ namespace BusinessCalendar.Helpers
             ws.Rows().AdjustToContents();
             ws.Columns().AdjustToContents();
         }
+
+        public static void SetCellHorizontalAlignmentCenter(IXLWorksheet ws, int row, int column) => ws.Cell(row, column).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+        public static void SetCellsHorizontalAlignmentCenter(IXLWorksheet ws, int startRow, int startColumn, int endRow, int endColumn) => ws.Range(startRow, startColumn, endRow, endColumn).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
     }
 }
