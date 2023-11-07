@@ -91,7 +91,7 @@ namespace BusinessCalendar.Controllers
 
                 return File(bytes,
                     System.Net.Mime.MediaTypeNames.Application.Octet,
-                    $"Report_{eventSignUps[0].Event!.Title}_{DateTime.Now:dd.MM.yyyy_HH:mm:SSzz}.zip");
+                    $"Report_{eventSignUps[0].Event!.Title}_{DateTime.Now:dd.MM.yyyy_HH:mm:sszz}.zip");
             }
             catch (Exception ex)
             {
