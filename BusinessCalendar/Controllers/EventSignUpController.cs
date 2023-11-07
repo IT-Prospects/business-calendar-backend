@@ -8,8 +8,8 @@ using Model;
 using System.Text;
 using ClosedXML.Excel;
 using ICSharpCode.SharpZipLib.Zip;
-using Model.Consts;
 using ICSharpCode.SharpZipLib.Core;
+using BusinessCalendar.ExcelReports;
 
 namespace BusinessCalendar.Controllers
 {
@@ -103,7 +103,7 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                using var workbook = ExcelHelper.LoadTemplate(ExcelTemplateConsts.EventSignUpsTemplate);
+                using var workbook = EventSignUpReport.LoadTemplate();
                 var sheet = ExcelHelper.GetSheet(workbook, 1);
 
                 var cells = new object[eventSignUps.Count, 3];
