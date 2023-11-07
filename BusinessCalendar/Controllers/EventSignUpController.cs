@@ -128,42 +128,37 @@ namespace BusinessCalendar.Controllers
 
         private byte[] GetReportArchive(IReadOnlyList<EventSignUp> eventSignUps)
         {
-            var tempArchivePath = $"temp_{Guid.NewGuid()}.zip";
             try
             {
                 using var excelStream = new MemoryStream();
                 GetReportExcel(eventSignUps, excelStream);
 
-                using var fileStream = System.IO.File.Create(tempArchivePath);
-                using var zipFileStream = new ZipOutputStream(fileStream);
+                using var zipStream = new MemoryStream();
+                using var zipOutputStream = new ZipOutputStream(zipStream);
 
                 var ev = eventSignUps[0].Event!;
-                zipFileStream.SetLevel(9);
-                zipFileStream.Password = ev.ArchivePassword;
+                zipOutputStream.SetLevel(9);
+                zipOutputStream.Password = ev.ArchivePassword;
 
                 var entry = new ZipEntry($"{ev.Title}.xlsx");
                 entry.DateTime = DateTime.Now;
-                zipFileStream.PutNextEntry(entry);
+                zipOutputStream.PutNextEntry(entry);
 
                 excelStream.Seek(0, SeekOrigin.Begin);
-                StreamUtils.Copy(excelStream, zipFileStream, new byte[4096]);
+                StreamUtils.Copy(excelStream, zipOutputStream, new byte[4096]);
 
-                zipFileStream.IsStreamOwner = true;
-                zipFileStream.Finish();
+                zipOutputStream.IsStreamOwner = true;
+                zipOutputStream.Finish();
 
-                fileStream.Seek(0, SeekOrigin.Begin);
-                var bytes = new byte[fileStream.Length];
-                fileStream.Read(bytes, 0, (int)fileStream.Length);
+                zipStream.Seek(0, SeekOrigin.Begin);
+                var bytes = new byte[zipStream.Length];
+                zipStream.Read(bytes, 0, (int)zipStream.Length);
 
                 return bytes;
             }
             catch (Exception ex)
             {
                 throw new Exception("An error occurred when forming the ZIP file.", ex);
-            }
-            finally
-            {
-                System.IO.File.Delete(tempArchivePath);
             }
         }
 
