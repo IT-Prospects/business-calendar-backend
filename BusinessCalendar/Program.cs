@@ -19,7 +19,16 @@ namespace BusinessCalendar
             });
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc(
+                    ConfigurationHelper.GetString("MajorVersion"), 
+                    new Microsoft.OpenApi.Models.OpenApiInfo { 
+                        Title = "Business Calendar API",
+                        Version = ConfigurationHelper.GetString("FullVersion")
+                    }
+                );
+            });
 
             builder.Services.AddDbContext<ModelContext>(options =>
             {
@@ -35,7 +44,11 @@ namespace BusinessCalendar
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint($"/swagger/{ConfigurationHelper.GetString("MajorVersion")}/swagger.json", ConfigurationHelper.GetString("MajorVersion"));
+                    // c.SwaggerEndpoint($"/swagger/{ConfigurationHelper.GetString("MajorVersion")}/swagger.json", ConfigurationHelper.GetString("MajorVersion"));
+                });
             }
 
             app.UseStaticFiles(new StaticFileOptions
