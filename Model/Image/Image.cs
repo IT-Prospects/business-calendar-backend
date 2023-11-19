@@ -4,7 +4,7 @@
     {
         #region props
 
-        public string Name { get; set; }
+        public string URL { get; set; }
 
         public Event? Event { get; set; }
 
@@ -16,14 +16,14 @@
 
         public Image() 
         {
-            Name = string.Empty;
+            URL = string.Empty;
             Event = null;
             Event_Id = null;
         }
 
-        public Image(string name, Event? ev)
+        public Image(string url, Event? ev)
         {
-            Name = name;
+            URL = url;
             Event = ev;
             Event_Id = ev?.Id;
         }

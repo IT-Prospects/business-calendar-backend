@@ -46,11 +46,11 @@ namespace DAL
             }
         }
 
-        public IEnumerable<string> GetAllPathsByEventId(long event_Id)
+        public IEnumerable<string> GetAllURLsByEventId(long event_Id)
         {
             try
             {
-                return DbSet.Where(x => x.Event_Id == event_Id).Select(x => x.Name).ToList();
+                return DbSet.Where(x => x.Event_Id == event_Id).Select(x => x.URL).ToList();
             }
             catch (Exception ex)
             {
