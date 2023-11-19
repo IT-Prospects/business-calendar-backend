@@ -51,13 +51,6 @@ namespace BusinessCalendar
                 });
             }
 
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(builder.Environment.ContentRootPath, ConfigurationHelper.GetString("imagesPath"))),
-                RequestPath = "/images"
-            });
-
             app.UseAuthorization();
 
             app.MapControllers();
