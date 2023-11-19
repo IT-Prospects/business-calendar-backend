@@ -10,6 +10,8 @@
 
         public long? Event_Id { get; set; }
 
+        public string FileName => URL.Split('/').Last();
+
         #endregion
 
         #region ctors

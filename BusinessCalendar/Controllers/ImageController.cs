@@ -44,17 +44,17 @@ namespace BusinessCalendar.Controllers
         [HttpPost]
         public IActionResult Post(IFormFile formFile)
         {
-            var name = string.Empty;
+            Image? newItem = null;
             try
             {
-                (var newItem, name) = AddImage(formFile);
+                newItem = AddImage(formFile);
                 _unitOfWork.SaveChanges();
                 return Ok(new ResponseObject(MappingToDTO(newItem)));
             }
             catch (Exception ex) when (ex is DbUpdateException or DbUpdateConcurrencyException)
             {
-                if(!string.IsNullOrEmpty(name))
-                    ImageFileHelper.DeleteImage(name);
+                if(!string.IsNullOrEmpty(newItem?.FileName))
+                    ImageFileHelper.DeleteImage(newItem.FileName);
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
             }
             catch (Exception ex)
@@ -67,17 +67,17 @@ namespace BusinessCalendar.Controllers
         [Route("Event")]
         public IActionResult AddImageForEvent(IFormFile formFile, long event_Id)
         {
-            var name = string.Empty;
+            Image? newItem = null;
             try
             {
-                (var newItem, name) = AddImage(formFile, event_Id);
+                newItem = AddImage(formFile, event_Id);
                 _unitOfWork.SaveChanges();
                 return Ok(new ResponseObject(MappingToDTO(newItem)));
             }
             catch (Exception ex) when (ex is DbUpdateException or DbUpdateConcurrencyException)
             {
-                if (!string.IsNullOrEmpty(name))
-                    ImageFileHelper.DeleteImage(name);
+                if (!string.IsNullOrEmpty(newItem?.FileName))
+                    ImageFileHelper.DeleteImage(newItem.FileName);
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
             }
             catch (Exception ex)
@@ -86,20 +86,16 @@ namespace BusinessCalendar.Controllers
             }
         }
 
-        private (Image, string) AddImage(IFormFile formFile, long? event_Id = null)
+        private Image AddImage(IFormFile formFile, long? event_Id = null)
         {
-            var yandexStorageURL = "https://storage.yandexcloud.net";
-            string name;
             var fileExtension = GetFileExtension(formFile.FileName);
-            var bucketName = ConfigurationHelper.GetString("YCBucketName");
-            var item = new Image(
-                $"{yandexStorageURL}/{bucketName}/{Guid.NewGuid()}{fileExtension}",
-                event_Id.HasValue ? _eventDAO.GetById(event_Id.Value) : null);
-            ImageFileHelper.SaveImage(formFile, name = item.URL.Split('/').Last());
+            var name = Guid.NewGuid() + fileExtension;
+            var url = ImageFileHelper.UploadImage(formFile, name);
+            var item = new Image(url, event_Id.HasValue ? _eventDAO.GetById(event_Id.Value) : null);
 
             var newItem = _imageDAO.Create();
             SetValues(item, newItem);
-            return (newItem, name);
+            return newItem;
         }
 
         private void SetValues(Image src, Image dst)

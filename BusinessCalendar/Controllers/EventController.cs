@@ -138,13 +138,13 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                var delImageURLs = _imageDAO.GetAllURLsByEventId(id);
+                var delImageURLs = _imageDAO.GetAllImageURLsByEventId(id);
                 _eventDAO.Delete(id);
                 _unitOfWork.SaveChanges();
 
-                foreach (var imgName in delImageURLs.Select(x => x.Split('/').Last()))
+                foreach (var name in delImageURLs)
                 {
-                    ImageFileHelper.DeleteImage(imgName);
+                    ImageFileHelper.DeleteImage(name);
                 }
 
                 return Ok(new ResponseObject(id));

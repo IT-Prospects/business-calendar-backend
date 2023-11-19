@@ -46,11 +46,11 @@ namespace DAL
             }
         }
 
-        public IEnumerable<string> GetAllURLsByEventId(long event_Id)
+        public IEnumerable<string> GetAllImageURLsByEventId(long event_Id)
         {
             try
             {
-                return DbSet.Where(x => x.Event_Id == event_Id).Select(x => x.URL).ToList();
+                return DbSet.Where(x => x.Event_Id == event_Id).Select(x => x.FileName).AsNoTracking().ToList();
             }
             catch (Exception ex)
             {

@@ -29,7 +29,7 @@ namespace BusinessCalendar.Helpers
             return new AmazonS3Client(_accessKey, _secretKey, config);
         }
 
-        public static void SaveImage(IFormFile formFile, string name)
+        public static string UploadImage(IFormFile formFile, string name)
         {
             try
             {
@@ -43,6 +43,7 @@ namespace BusinessCalendar.Helpers
                 };
 
                 _ = client.PutObjectAsync(request).Result;
+                return GetImageURLByName(name);
             }
             catch (Exception ex)
             {
@@ -67,6 +68,12 @@ namespace BusinessCalendar.Helpers
             {
                 throw new Exception("An error occurred while receiving the file.", ex);
             }
+        }
+
+        private static string GetImageURLByName(string name)
+        {
+            var yandexStorageURL = "https://storage.yandexcloud.net";
+            return $"{yandexStorageURL}/{_bucketName}/{name}";
         }
     }
 }
