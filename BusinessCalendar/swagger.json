@@ -402,7 +402,7 @@
             "format": "int64",
             "nullable": true
           },
-          "imageName": {
+          "imageURL": {
             "type": "string",
             "nullable": true
           }
