@@ -44,17 +44,17 @@ namespace BusinessCalendar.Controllers
         [HttpPost]
         public IActionResult Post(IFormFile formFile)
         {
-            var path = string.Empty;
+            var name = string.Empty;
             try
             {
-                (var newItem, path) = AddImage(formFile);
+                (var newItem, name) = AddImage(formFile);
                 _unitOfWork.SaveChanges();
                 return Ok(new ResponseObject(MappingToDTO(newItem)));
             }
             catch (Exception ex) when (ex is DbUpdateException or DbUpdateConcurrencyException)
             {
-                if(!string.IsNullOrEmpty(path))
-                    ImageFileHelper.DeleteImage(path);
+                if(!string.IsNullOrEmpty(name))
+                    ImageFileHelper.DeleteImage(name);
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
             }
             catch (Exception ex)
