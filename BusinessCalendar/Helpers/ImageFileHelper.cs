@@ -50,25 +50,6 @@ namespace BusinessCalendar.Helpers
             }
         }
 
-        public static Stream GetImage(string name)
-        {
-            try
-            {
-                using var client = CreateS3Client();
-                var request = new GetObjectRequest
-                {
-                    BucketName = _bucketName,
-                    Key = name,
-                };
-
-                return client.GetObjectAsync(request).Result.ResponseStream;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while receiving the file.", ex);
-            }
-        }
-
         public static void DeleteImage(string name)
         {
             try
