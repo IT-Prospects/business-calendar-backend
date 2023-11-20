@@ -4,11 +4,13 @@
     {
         #region props
 
-        public string Name { get; set; }
+        public string URL { get; set; }
 
         public Event? Event { get; set; }
 
         public long? Event_Id { get; set; }
+
+        public string FileName => URL.Split('/').Last();
 
         #endregion
 
@@ -16,14 +18,14 @@
 
         public Image() 
         {
-            Name = string.Empty;
+            URL = string.Empty;
             Event = null;
             Event_Id = null;
         }
 
-        public Image(string name, Event? ev)
+        public Image(string url, Event? ev)
         {
-            Name = name;
+            URL = url;
             Event = ev;
             Event_Id = ev?.Id;
         }

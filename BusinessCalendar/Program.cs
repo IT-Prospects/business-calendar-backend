@@ -1,3 +1,4 @@
+using BusinessCalendar.Helpers;
 using DAL.Common;
 using DAL.Context;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace BusinessCalendar
             var builder = WebApplication.CreateBuilder(args);
 
             ConfigurationHelper.SetConfiguration(builder.Configuration);
+            ImageFileHelper.InitConfiguration();
 
             builder.Services.AddControllers().AddNewtonsoftJson(jsonOptions =>
             {
@@ -50,13 +52,6 @@ namespace BusinessCalendar
                     // c.SwaggerEndpoint($"/swagger/{ConfigurationHelper.GetString("MajorVersion")}/swagger.json", ConfigurationHelper.GetString("MajorVersion"));
                 });
             }
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(builder.Environment.ContentRootPath, ConfigurationHelper.GetString("imagesPath"))),
-                RequestPath = "/images"
-            });
 
             app.UseAuthorization();
 

@@ -34,7 +34,7 @@ namespace DAL
                 Image = mainImg,
                 Image_Id = mainImg.Id,
                 SubImages = subImg.Where(x => x.Id != ev.Image_Id)
-                    .Select(x => new Image { Id = x.Id, Name = x.Name, Event = ev, Event_Id = ev.Id }).ToList(),
+                    .Select(x => new Image { Id = x.Id, URL = x.URL, Event = ev, Event_Id = ev.Id }).ToList(),
             };
 
         public Event GetById(long id)
