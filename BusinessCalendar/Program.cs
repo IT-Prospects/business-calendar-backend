@@ -1,7 +1,12 @@
+using System.Text;
+using BusinessCalendar.Controllers;
 using DAL.Common;
 using DAL.Context;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BusinessCalendar
 {
@@ -29,6 +34,22 @@ namespace BusinessCalendar
                     }
                 );
             });
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = false,
+                        //ValidIssuer = AuthOptions.Issuer,
+                        ValidateAudience = false,
+                        //ValidAudience = AuthOptions.Audience,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                        ValidateIssuerSigningKey = true,
+                    };
+                });
 
             builder.Services.AddDbContext<ModelContext>(options =>
             {
@@ -58,8 +79,8 @@ namespace BusinessCalendar
                 RequestPath = "/images"
             });
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
 
             app.Run();
