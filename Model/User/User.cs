@@ -14,11 +14,12 @@ namespace Model
 
         public string LastName { get; set; }
 
-        public string? Patronymic { get; set; }
-
         public string Email { get; set; }
 
         public string PhoneNumber { get; set; }
+
+        public string Password { get; set; }
+        public string? RefreshToken { get; set; }
 
         #endregion
 
@@ -28,23 +29,39 @@ namespace Model
         {
             FirstName = string.Empty;
             LastName = string.Empty;
-            Patronymic = null;
             Email = string.Empty;
             PhoneNumber = string.Empty;
+            Password = string.Empty;
         }
 
         public User(
             string firstName,
             string lastName,
-            string? patronymic,
             string email,
-            string phoneNumber)
+            string phoneNumber,
+            string password)
         {
             FirstName = firstName;
             LastName = lastName;
-            Patronymic = patronymic;
             Email = email;
             PhoneNumber = phoneNumber;
+            Password = password;
+        }
+
+        public User(
+            string firstName,
+            string lastName,
+            string email,
+            string phoneNumber,
+            string password,
+            string refreshToken)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            PhoneNumber = phoneNumber;
+            Password = password;
+            RefreshToken = refreshToken;
         }
 
         #endregion
