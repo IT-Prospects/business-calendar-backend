@@ -138,13 +138,13 @@ namespace BusinessCalendar.Controllers
         {
             try
             {
-                var delImages = _imageDAO.GetAllPathsByEventId(id);
+                var delImageURLs = _imageDAO.GetAllImageURLsByEventId(id);
                 _eventDAO.Delete(id);
                 _unitOfWork.SaveChanges();
 
-                foreach (var imgPath in delImages)
+                foreach (var name in delImageURLs)
                 {
-                    ImageFileHelper.DeleteImageFile(imgPath);
+                    ImageFileHelper.DeleteImage(name);
                 }
 
                 return Ok(new ResponseObject(id));
@@ -225,7 +225,7 @@ namespace BusinessCalendar.Controllers
                 EventDuration = item.EventDuration,
                 ArchivePassword = item.ArchivePassword,
                 Image_Id = item.Image!.Id,
-                ImageName = item.Image!.Name
+                ImageURL = item.Image!.URL
             };
         }
     }

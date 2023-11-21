@@ -18,6 +18,6 @@
 
         public long? Image_Id { get; set; }
 
-        public string? ImageName { get; set; }
+        public string? ImageURL { get; set; }
     }
 }
