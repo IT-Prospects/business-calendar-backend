@@ -1,0 +1,78 @@
+name: Deploy Backend App with Docker
+
+on:
+  workflow_dispatch:
+    inputs:
+      target-env:
+        required: true
+        type: environment
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ inputs.target-env }}
+    steps:
+    - name: Logs
+      run: echo '### The deployment is made on the `${{ inputs.target-env }}` machine' >> $GITHUB_STEP_SUMMARY
+      
+    - uses: actions/checkout@v4
+    - name: set vars
+      id: vars
+      run: |
+        echo ::set-output name=BRANCH::${GITHUB_REF#refs/heads/}
+        echo ::set-output name=HASH::$(git rev-parse --short ${GITHUB_SHA})
+        echo ::set-output name=DATE::$(date +'%d-%m-%Y')
+        
+    - name: set imagename
+      id: imagename
+      run: echo ::set-output name=IMAGENAME::${t-bc-backend-${{ steps.vars.outputs.BRANCH }}-${{ steps.vars.outputs.DATE }}} 
+        
+    - name: build
+      run: |
+        echo '### Name image: `${{ steps.imagename.outputs.IMAGENAME }}:${{ steps.vars.outputs.HASH }}` ' >> $GITHUB_STEP_SUMMARY
+        docker build . -t cr.yandex/${{ vars.ID_CONTAINER_REGISTRY }}/${{ steps.imagename.outputs.IMAGENAME }}:${{ steps.vars.outputs.HASH }}
+        
+    - name: Login to Yandex Cloud Container Registry
+      id: login-cr
+      uses: yc-actions/yc-cr-login@v1
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+    - name: upload in Container Registry
+      run: docker push cr.yandex/${{ vars.ID_CONTAINER_REGISTRY }}/${{ steps.imagename.outputs.IMAGENAME }}:${{ steps.vars.outputs.HASH }}
+
+    - name: creating a migration
+      run: |
+        dotnet tool install --global dotnet-ef
+        dotnet tool restore
+        cd BusinessCalendar
+        dotnet ef migrations script -o ../migration-${{ steps.vars.outputs.BRANCH }}-${{ steps.vars.outputs.HASH }}-${{ steps.vars.outputs.DATE }}.txt
+        
+    - name: upload migration in yandex storage
+      uses: nekitcorp/yandex-storage-website-action@v2
+      with:
+        access-key-id: ${{ secrets.ACCESS_KEY_ID }}
+        secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+        bucket: ${{ secrets.BUCKET }}
+        include: migration-${{ steps.vars.outputs.BRANCH }}-${{ steps.vars.outputs.HASH }}-${{ steps.vars.outputs.DATE }}.txt
+        
+    - name: connect to vm and deploy 
+      uses: appleboy/ssh-action@v1.0.0
+      env: 
+        IMAGE: cr.yandex/${{ vars.ID_CONTAINER_REGISTRY }}/${{ steps.imagename.outputs.IMAGENAME }}:${{ steps.vars.outputs.HASH }}
+      with:
+        host: ${{ vars.HOST }}
+        username: ${{ vars.USERNAME }}
+        key: ${{ secrets.KEY }}
+        port: ${{ vars.PORT }}
+        proxy_host: ${{ vars.PROXY_HOST }}
+        proxy_username: ${{ vars.PROXY_USERNAME }}
+        proxy_key: ${{ secrets.PROXY_KEY }}
+        proxy_port: ${{ vars.PROXY_PORT }}
+        envs: IMAGE
+        script: |
+          sudo docker stop last_backend
+          sudo docker rm last_backend
+          sudo docker pull $IMAGE
+          sudo docker run -d --net=host --restart=always --name=last_backend $IMAGE
