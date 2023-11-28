@@ -62,7 +62,7 @@ jobs:
         dotnet tool restore
         cd BusinessCalendar
         dotnet ef migrations script -o ../migration-${{ steps.vars.outputs.BRANCH }}-${{ steps.vars.outputs.HASH }}-${{ steps.vars.outputs.DATE }}.txt
-        echo '### Migration image: `migration-${{ steps.vars.outputs.BRANCH }}-${{ steps.vars.outputs.HASH }}-${{ steps.vars.outputs.DATE }}.txt` ' >> $GITHUB_STEP_SUMMARY
+        echo '### Migration name: `migration-${{ steps.vars.outputs.BRANCH }}-${{ steps.vars.outputs.HASH }}-${{ steps.vars.outputs.DATE }}.txt` ' >> $GITHUB_STEP_SUMMARY
         
     - name: upload migration in yandex storage
       uses: nekitcorp/yandex-storage-website-action@v2
