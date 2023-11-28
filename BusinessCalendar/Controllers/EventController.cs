@@ -3,7 +3,6 @@ using BusinessCalendar.Helpers;
 using DAL;
 using DAL.Common;
 using DAL.Params;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using Model.DTO;
@@ -12,7 +11,6 @@ using System.Text;
 
 namespace BusinessCalendar.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class EventController : Controller
@@ -30,7 +28,6 @@ namespace BusinessCalendar.Controllers
             _unitOfWork = uow;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         [Route("targetdate={targetDate}&offset={offset}")]
         public IActionResult Get(DateOnly targetDate, int offset)
@@ -47,7 +44,6 @@ namespace BusinessCalendar.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpGet]
         [Route("currentdate={currentDate}")]
         public IActionResult Get(DateTime currentDate)
@@ -64,7 +60,6 @@ namespace BusinessCalendar.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpGet]
         [Route("id={id}")]
         public IActionResult Get(long id)
@@ -92,7 +87,7 @@ namespace BusinessCalendar.Controllers
                 var item = MappingToDomainObject(itemDTO);
 
                 var rand = new Random((int)DateTime.Now.Ticks);
-                item.ArchivePassword = string.Join(string.Empty, new char[12].Select(x => (char)rand.Next(0x0021, 0x007E)));
+                item.ArchivePassword = string.Join(string.Empty, new char[12].Select(_ => (char)rand.Next(0x0021, 0x007E)));
 
                 var newItem = _eventDAO.Create();
                 SetValues(item, newItem);

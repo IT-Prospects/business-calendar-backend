@@ -1,6 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using BusinessCalendar.Common;
 using BusinessCalendar.Helpers;
 using DAL.Common;
@@ -9,16 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
 using Model;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
-using _2DAL.Migrations;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace BusinessCalendar.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class UserController : Controller
@@ -34,7 +25,6 @@ namespace BusinessCalendar.Controllers
             _userDAO = new UserDAO(uow);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         [Route("SignUp")]
         public IActionResult SignUp(UserDTO itemDTO)
@@ -64,35 +54,6 @@ namespace BusinessCalendar.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
             }
-        }
-
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("SignIn")]
-        public IActionResult SignIn(UserSignInDTO itemDTO)
-        {
-            AuthHelper.InitDAO(_userDAO);
-            if (!IsValidDTO(itemDTO, out var message) || !AuthHelper.AuthenticateUser(itemDTO, out message, out var user))
-            {
-                return BadRequest(new ResponseObject(message));
-            }
-            var (token, refreshToken) = AuthHelper.AuthorizeUser(user!);
-
-            _unitOfWork.SaveChanges();
-            return Ok(new ResponseObject(new { token, refreshToken }));
-        }
-
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("RefreshToken")]
-        public IActionResult RefreshToken([FromBody] string refreshToken)
-        {
-            AuthHelper.InitDAO(_userDAO);
-            var token = HttpContext.Request.Headers.Authorization.ToString()[7..];
-            (token, refreshToken) = AuthHelper.AuthorizeUser(token, refreshToken);
-
-            _unitOfWork.SaveChanges();
-            return Ok(new ResponseObject(new {token, refreshToken}));
         }
 
         private void SetValues(User src, User dst)

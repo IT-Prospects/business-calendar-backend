@@ -5,12 +5,10 @@ using Model;
 using BusinessCalendar.Common;
 using Microsoft.EntityFrameworkCore;
 using BusinessCalendar.Helpers;
-using Microsoft.AspNetCore.Authorization;
 using Model.DTO;
 
 namespace BusinessCalendar.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class ImageController : Controller

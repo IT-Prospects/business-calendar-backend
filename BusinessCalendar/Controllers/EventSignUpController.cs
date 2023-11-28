@@ -10,11 +10,9 @@ using ClosedXML.Excel;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
 using BusinessCalendar.ExcelReports;
-using Microsoft.AspNetCore.Authorization;
 
 namespace BusinessCalendar.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class EventSignUpController : Controller
@@ -32,7 +30,6 @@ namespace BusinessCalendar.Controllers
             _eventDAO = new EventDAO(uow);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         [Route("")]
         public IActionResult Post(EventSignUpDTO itemDTO)

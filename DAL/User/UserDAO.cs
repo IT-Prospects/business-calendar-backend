@@ -44,18 +44,6 @@ namespace DAL
             }
         }
 
-        public User? GetByEmail(string email)
-        {
-            try
-            {
-                return DbSetView.SingleOrDefault(x => x.Email == email);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format(_errorReceiveObject, DbSet.GetType()), ex);
-            }
-        }
-
         public User Create()
         {
             var item = new User();
