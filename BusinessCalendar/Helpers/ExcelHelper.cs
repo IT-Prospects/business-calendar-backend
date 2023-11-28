@@ -4,8 +4,6 @@ namespace BusinessCalendar.Helpers
 {
     public static class ExcelHelper
     {
-        private static string _templatesPath = @"ExcelTemplates";
-
         public static void SaveWithFileName(IXLWorkbook xlc, string filename) => xlc.SaveAs(filename);
 
         public static void Save(IXLWorkbook excel, Stream stream)
