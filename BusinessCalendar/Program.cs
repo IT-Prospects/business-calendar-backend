@@ -17,7 +17,27 @@ namespace BusinessCalendar
 
             ConfigurationHelper.SetConfiguration(builder.Configuration);
             ImageFileHelper.InitConfiguration();
+            AuthHelper.InitConfiguration();
 
+            builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidIssuer = AuthHelper.Issuer,
+                        ValidateAudience = true,
+                        ValidAudience = AuthHelper.Audience,
+                        ValidateIssuer = true,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = AuthHelper.GetSymmetricSecurityKey(),
+                        ValidateIssuerSigningKey = true,
+                    };
+                });
             builder.Services.AddControllers().AddNewtonsoftJson(jsonOptions =>
             {
                 jsonOptions.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
@@ -27,29 +47,14 @@ namespace BusinessCalendar
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc(
-                    ConfigurationHelper.GetString("MajorVersion"), 
-                    new Microsoft.OpenApi.Models.OpenApiInfo { 
+                    ConfigurationHelper.GetString("MajorVersion"),
+                    new Microsoft.OpenApi.Models.OpenApiInfo
+                    {
                         Title = "Business Calendar API",
                         Version = ConfigurationHelper.GetString("FullVersion")
                     }
                 );
             });
-
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.RequireHttpsMetadata = false;
-                    options.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        ValidateIssuer = false,
-                        //ValidIssuer = AuthOptions.Issuer,
-                        ValidateAudience = false,
-                        //ValidAudience = AuthOptions.Audience,
-                        ValidateLifetime = true,
-                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                        ValidateIssuerSigningKey = true,
-                    };
-                });
 
             builder.Services.AddDbContext<ModelContext>(options =>
             {

@@ -9,10 +9,16 @@ using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
 using Model;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using _2DAL.Migrations;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace BusinessCalendar.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class UserController : Controller
@@ -28,6 +34,7 @@ namespace BusinessCalendar.Controllers
             _userDAO = new UserDAO(uow);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("SignUp")]
         public IActionResult SignUp(UserDTO itemDTO)
@@ -59,77 +66,33 @@ namespace BusinessCalendar.Controllers
             }
         }
 
-
+        [AllowAnonymous]
         [HttpPost]
         [Route("SignIn")]
         public IActionResult SignIn(UserSignInDTO itemDTO)
         {
-            if (!IsValidDTO(itemDTO, out var message) || !AuthenticateUser(itemDTO, out message))
+            AuthHelper.InitDAO(_userDAO);
+            if (!IsValidDTO(itemDTO, out var message) || !AuthHelper.AuthenticateUser(itemDTO, out message, out var user))
             {
                 return BadRequest(new ResponseObject(message));
             }
+            var (token, refreshToken) = AuthHelper.AuthorizeUser(user!);
 
-            var user = _userDAO.GetByEmail(itemDTO.Email!)!;
-
-            var claims = new List<Claim>
-            {
-                new(ClaimsIdentity.DefaultNameClaimType, user.Id.ToString()),
-                new(ClaimsIdentity.DefaultRoleClaimType, "user")
-            };
-            var claimsIdentity = new ClaimsIdentity(claims, "Token",
-                ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-
-            var now = DateTime.UtcNow.AddMinutes(-500);
-            var now2 = DateTime.UtcNow.AddMinutes(1000);
-            // создаем JWT-токен
-            var jwt = new JwtSecurityToken(
-                issuer: "BusinessCalendarBackend",
-                audience: AuthOptions.Audience,
-                notBefore: now,
-                claims: claimsIdentity.Claims,
-                expires: now2,
-                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-            var token = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            using var sha256 = SHA256.Create();
-            user.RefreshToken = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(token)));
             _unitOfWork.SaveChanges();
-            return Ok(new {user.Id, token, user.RefreshToken});
+            return Ok(new ResponseObject(new { token, refreshToken }));
         }
 
-        private bool AuthenticateUser(UserSignInDTO userDTO, out string message)
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("RefreshToken")]
+        public IActionResult RefreshToken([FromBody] string refreshToken)
         {
-            message = string.Empty;
-            var user = _userDAO.GetByEmail(userDTO.Email!);
-            if (user == null)
-            {
-                message = "Bad user email";
-                return false;
-            }
+            AuthHelper.InitDAO(_userDAO);
+            var token = HttpContext.Request.Headers.Authorization.ToString()[7..];
+            (token, refreshToken) = AuthHelper.AuthorizeUser(token, refreshToken);
 
-            using var sha256 = SHA256.Create();
-            var hashedPassword = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(userDTO.Password!)));
-            if (hashedPassword == user.Password) 
-                return true;
-            message = "Bad user password";
-            return false;
-        }
-
-        [HttpDelete]
-        [Route("id={id}")]
-        public IActionResult Delete(long id)
-        {
-            try
-            {
-                _userDAO.Delete(id);
-                _unitOfWork.SaveChanges();
-
-                return Ok(new ResponseObject(id));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
-            }
+            _unitOfWork.SaveChanges();
+            return Ok(new ResponseObject(new {token, refreshToken}));
         }
 
         private void SetValues(User src, User dst)
@@ -189,10 +152,5 @@ namespace BusinessCalendar.Controllers
                 Password = item.Password
             };
         }
-    }
-
-    public class AuthOptions
-    {
-       
     }
 }
