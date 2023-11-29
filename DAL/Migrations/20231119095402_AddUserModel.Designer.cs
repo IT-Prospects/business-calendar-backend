@@ -3,6 +3,7 @@ using System;
 using DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,13 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace _2DAL.Migrations
 {
     [DbContext(typeof(ModelContext))]
-    partial class ModelContextModelSnapshot : ModelSnapshot
+    [Migration("20231119095402_AddUserModel")]
+    partial class AddUserModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.14")
+                .HasAnnotation("ProductVersion", "7.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -130,17 +133,17 @@ namespace _2DAL.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("event_id");
 
-                    b.Property<string>("URL")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("url");
+                        .HasColumnName("name");
 
                     b.HasKey("Id")
                         .HasName("pk_imageset");
 
                     b.HasIndex("Event_Id");
 
-                    b.HasIndex("URL")
+                    b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("imageset", (string)null);
@@ -170,19 +173,14 @@ namespace _2DAL.Migrations
                         .HasColumnType("text")
                         .HasColumnName("lastname");
 
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
+                    b.Property<string>("Patronymic")
                         .HasColumnType("text")
-                        .HasColumnName("passwordhash");
+                        .HasColumnName("patronymic");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("phonenumber");
-
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("text")
-                        .HasColumnName("refreshtoken");
 
                     b.HasKey("Id")
                         .HasName("pk_userset");

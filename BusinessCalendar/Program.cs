@@ -2,7 +2,6 @@ using BusinessCalendar.Helpers;
 using DAL.Common;
 using DAL.Context;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 
 namespace BusinessCalendar
 {
@@ -14,7 +13,7 @@ namespace BusinessCalendar
 
             ConfigurationHelper.SetConfiguration(builder.Configuration);
             ImageFileHelper.InitConfiguration();
-
+           
             builder.Services.AddControllers().AddNewtonsoftJson(jsonOptions =>
             {
                 jsonOptions.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
@@ -24,8 +23,9 @@ namespace BusinessCalendar
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc(
-                    ConfigurationHelper.GetString("MajorVersion"), 
-                    new Microsoft.OpenApi.Models.OpenApiInfo { 
+                    ConfigurationHelper.GetString("MajorVersion"),
+                    new Microsoft.OpenApi.Models.OpenApiInfo
+                    {
                         Title = "Business Calendar API",
                         Version = ConfigurationHelper.GetString("FullVersion")
                     }
@@ -37,9 +37,9 @@ namespace BusinessCalendar
                 options.UseNpgsql(GetConnectionString());
             });
 
-            builder.Services.AddScoped<ModelContext>(x => new ModelContext(GetConnectionString()));
+            builder.Services.AddScoped<ModelContext>(_ => new ModelContext(GetConnectionString()));
 
-            builder.Services.AddScoped(x => new UnitOfWork());
+            builder.Services.AddScoped(_ => new UnitOfWork());
 
             var app = builder.Build();
 
@@ -53,8 +53,8 @@ namespace BusinessCalendar
                 });
             }
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
 
             app.Run();

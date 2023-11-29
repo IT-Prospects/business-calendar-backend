@@ -17,12 +17,12 @@ namespace BusinessCalendar.Controllers
     [Route("[controller]")]
     public class EventSignUpController : Controller
     {
-        private readonly ILogger<EventController> _logger;
+        private readonly ILogger<EventSignUpController> _logger;
         private readonly EventSignUpDAO _eventSignUpDAO;
         private readonly EventDAO _eventDAO;
         private readonly UnitOfWork _unitOfWork;
 
-        public EventSignUpController(ILogger<EventController> logger, UnitOfWork uow)
+        public EventSignUpController(ILogger<EventSignUpController> logger, UnitOfWork uow)
         {
             _logger = logger;
             _unitOfWork = uow;

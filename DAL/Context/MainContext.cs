@@ -67,6 +67,19 @@ namespace DAL.Context
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("userset");
+                entity.HasKey(e => e.Id).HasName("pk_userset");
+                entity.Property(e => e.Id).HasColumnName("id").HasColumnType("bigint").ValueGeneratedOnAdd();
+                entity.Property(e => e.FirstName).HasColumnName("firstname").HasColumnType("text").IsRequired();
+                entity.Property(e => e.LastName).HasColumnName("lastname").HasColumnType("text").IsRequired();
+                entity.Property(e => e.Email).HasColumnName("email").HasColumnType("text").IsRequired();
+                entity.Property(e => e.PhoneNumber).HasColumnName("phonenumber").HasColumnType("text").IsRequired();
+                entity.Property(e => e.PasswordHash).HasColumnName("passwordhash").HasColumnType("text").IsRequired();
+                entity.Property(e => e.RefreshToken).HasColumnName("refreshtoken").HasColumnType("text").IsRequired(false);
+            });
+
             return modelBuilder;
         }
     }

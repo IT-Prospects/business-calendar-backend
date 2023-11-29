@@ -87,7 +87,7 @@ namespace BusinessCalendar.Controllers
                 var item = MappingToDomainObject(itemDTO);
 
                 var rand = new Random((int)DateTime.Now.Ticks);
-                item.ArchivePassword = string.Join(string.Empty, new char[12].Select(x => (char)rand.Next(0x0021, 0x007E)));
+                item.ArchivePassword = string.Join(string.Empty, new char[12].Select(_ => (char)rand.Next(0x0021, 0x007E)));
 
                 var newItem = _eventDAO.Create();
                 SetValues(item, newItem);
