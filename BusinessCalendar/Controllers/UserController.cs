@@ -43,7 +43,7 @@ namespace BusinessCalendar.Controllers
                 }
                 using var sha256 = SHA256.Create();
 
-                item.Password = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(item.Password)));
+                item.PasswordHash = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(item.PasswordHash)));
 
                 var newItem = _userDAO.Create();
                 SetValues(item, newItem);
@@ -61,29 +61,39 @@ namespace BusinessCalendar.Controllers
             _unitOfWork.Context().Entry(dst).CurrentValues.SetValues(src);
         }
 
-        private bool IsValidDTO(IUserDTO item, out string message)
+        private const string _requiredFieldErrorMessageTemplate = "Required field \"{0}\" is not filled in";
+
+        private bool IsValidDTO(UserDTO item, out string message)
         {
             var stringBuilder = new StringBuilder(string.Empty);
-            const string requiredFieldErrorMessageTemplate = "Required field \"{0}\" is not filled in";
 
+            IsValidDTO(new UserSignInDTO { Email = item.Email, Password = item.Password }, out var innerMessage);
 
-            if (item is UserDTO userDTO)
-            {
-                if (string.IsNullOrWhiteSpace(userDTO.FirstName))
-                    stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(userDTO.FirstName)));
+            stringBuilder.Append(innerMessage);
 
-                if (string.IsNullOrWhiteSpace(userDTO.LastName))
-                    stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(userDTO.LastName)));
+            if (string.IsNullOrWhiteSpace(item.FirstName))
+                stringBuilder.AppendLine(string.Format(_requiredFieldErrorMessageTemplate, nameof(item.FirstName)));
 
-                if (string.IsNullOrWhiteSpace(userDTO.PhoneNumber))
-                    stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(userDTO.PhoneNumber)));
-            }
+            if (string.IsNullOrWhiteSpace(item.LastName))
+                stringBuilder.AppendLine(string.Format(_requiredFieldErrorMessageTemplate, nameof(item.LastName)));
+
+            if (string.IsNullOrWhiteSpace(item.PhoneNumber))
+                stringBuilder.AppendLine(string.Format(_requiredFieldErrorMessageTemplate, nameof(item.PhoneNumber)));
+
+            message = stringBuilder.ToString();
+
+            return message == string.Empty;
+        }
+
+        private bool IsValidDTO(UserSignInDTO item, out string message)
+        {
+            var stringBuilder = new StringBuilder(string.Empty);
 
             if (string.IsNullOrWhiteSpace(item.Email))
-                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(item.Email)));
+                stringBuilder.AppendLine(string.Format(_requiredFieldErrorMessageTemplate, nameof(item.Email)));
 
             if (string.IsNullOrWhiteSpace(item.Password))
-                stringBuilder.AppendLine(string.Format(requiredFieldErrorMessageTemplate, nameof(item.Password)));
+                stringBuilder.AppendLine(string.Format(_requiredFieldErrorMessageTemplate, nameof(item.Password)));
 
             message = stringBuilder.ToString();
 
@@ -109,8 +119,7 @@ namespace BusinessCalendar.Controllers
                 FirstName = item.FirstName,
                 LastName = item.LastName,
                 Email = item.Email,
-                PhoneNumber = item.PhoneNumber,
-                Password = item.Password
+                PhoneNumber = item.PhoneNumber
             };
         }
     }

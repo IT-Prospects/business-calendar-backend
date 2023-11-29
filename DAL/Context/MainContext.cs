@@ -76,7 +76,7 @@ namespace DAL.Context
                 entity.Property(e => e.LastName).HasColumnName("lastname").HasColumnType("text").IsRequired();
                 entity.Property(e => e.Email).HasColumnName("email").HasColumnType("text").IsRequired();
                 entity.Property(e => e.PhoneNumber).HasColumnName("phonenumber").HasColumnType("text").IsRequired();
-                entity.Property(e => e.Password).HasColumnName("password").HasColumnType("text").IsRequired();
+                entity.Property(e => e.PasswordHash).HasColumnName("passwordhash").HasColumnType("text").IsRequired();
                 entity.Property(e => e.RefreshToken).HasColumnName("refreshtoken").HasColumnType("text").IsRequired(false);
             });
 

@@ -1,6 +1,6 @@
 ﻿namespace Model.DTO
 {
-    public class UserSignInDTO : IUserDTO
+    public class UserSignInDTO
     {
         public string? Email { get; set; }
 

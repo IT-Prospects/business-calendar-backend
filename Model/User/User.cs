@@ -12,7 +12,7 @@
 
         public string PhoneNumber { get; set; }
 
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
 
         public string? RefreshToken { get; set; }
 
@@ -26,7 +26,7 @@
             LastName = string.Empty;
             Email = string.Empty;
             PhoneNumber = string.Empty;
-            Password = string.Empty;
+            PasswordHash = string.Empty;
         }
 
         public User(
@@ -34,28 +34,14 @@
             string lastName,
             string email,
             string phoneNumber,
-            string password)
+            string passwordHash,
+            string? refreshToken = null)
         {
             FirstName = firstName;
             LastName = lastName;
             Email = email;
             PhoneNumber = phoneNumber;
-            Password = password;
-        }
-
-        public User(
-            string firstName,
-            string lastName,
-            string email,
-            string phoneNumber,
-            string password,
-            string refreshToken)
-        {
-            FirstName = firstName;
-            LastName = lastName;
-            Email = email;
-            PhoneNumber = phoneNumber;
-            Password = password;
+            PasswordHash = passwordHash;
             RefreshToken = refreshToken;
         }
 

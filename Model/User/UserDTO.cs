@@ -1,6 +1,6 @@
 ﻿namespace Model.DTO
 {
-    public class UserDTO : IUserDTO
+    public class UserDTO
     {
         public string? FirstName { get; set; }
 
