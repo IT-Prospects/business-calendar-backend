@@ -67,7 +67,7 @@ namespace BusinessCalendar.Controllers
         {
             var stringBuilder = new StringBuilder(string.Empty);
 
-            IsValidDTO(new UserSignInDTO { Email = item.Email, Password = item.Password }, out var innerMessage);
+            IsValidUserSignInDTO(new UserSignInDTO { Email = item.Email, Password = item.Password }, out var innerMessage);
 
             stringBuilder.Append(innerMessage);
 
@@ -85,7 +85,7 @@ namespace BusinessCalendar.Controllers
             return message == string.Empty;
         }
 
-        private bool IsValidDTO(UserSignInDTO item, out string message)
+        private bool IsValidUserSignInDTO(UserSignInDTO item, out string message)
         {
             var stringBuilder = new StringBuilder(string.Empty);
 
