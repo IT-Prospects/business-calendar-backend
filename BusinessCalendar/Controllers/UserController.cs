@@ -61,30 +61,51 @@ namespace BusinessCalendar.Controllers
         [Route("SignIn")]
         public IActionResult SignIn(UserSignInDTO itemDTO)
         {
-            AuthHelper.InitDAO(_userDAO);
-            if (!IsValidUserSignInDTO(itemDTO, out var message) || !AuthHelper.AuthenticateUser(itemDTO, out message, out var user))
+            try
             {
-                return BadRequest(new ResponseObject(message));
-            }
-            var (token, refreshToken) = AuthHelper.AuthorizeUser(user!);
+                AuthHelper.InitDAO(_userDAO);
+                if (!IsValidUserSignInDTO(itemDTO, out var message) ||
+                    !AuthHelper.AuthenticateUser(itemDTO, out message, out var user))
+                {
+                    return BadRequest(new ResponseObject(message));
+                }
 
-            _unitOfWork.SaveChanges();
-            return Ok(new ResponseObject(new { token, refreshToken }));
+                var (token, refreshToken) = AuthHelper.GetTokens(user!);
+
+                user!.RefreshToken = refreshToken;
+
+                _unitOfWork.SaveChanges();
+                return Ok(new ResponseObject(new { token, refreshToken }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
         }
 
         [HttpPost]
         [Route("RefreshToken")]
         public IActionResult RefreshToken([FromBody] string refreshToken)
         {
-            AuthHelper.InitDAO(_userDAO);
-            var authHeaderValue = HttpContext.Request.Headers.Authorization.ToString();
-            if (string.IsNullOrWhiteSpace(authHeaderValue))
-                return BadRequest("Required Authorization header is missing.");
-            var token = authHeaderValue[7..];
-            (token, refreshToken) = AuthHelper.AuthorizeUser(token, refreshToken);
+            try
+            {
+                AuthHelper.InitDAO(_userDAO);
+                var authHeaderValue = HttpContext.Request.Headers.Authorization.ToString();
+                if (string.IsNullOrWhiteSpace(authHeaderValue))
+                    return BadRequest("Required Authorization header is missing.");
 
-            _unitOfWork.SaveChanges();
-            return Ok(new ResponseObject(new { token, refreshToken }));
+                var token = authHeaderValue.Replace("Bearer ", "");
+                (token, refreshToken) = AuthHelper.GetRefreshedTokens(token, refreshToken, out var user);
+
+                user.RefreshToken = refreshToken;
+
+                _unitOfWork.SaveChanges();
+                return Ok(new ResponseObject(new { token, refreshToken }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
         }
 
         private void SetValues(User src, User dst)

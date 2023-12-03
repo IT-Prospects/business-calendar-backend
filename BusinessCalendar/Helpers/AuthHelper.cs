@@ -13,9 +13,8 @@ namespace BusinessCalendar.Helpers
     public static class AuthHelper
     {
         private const string _userDAONotInitializedError = "User DAO was not initialized.";
-        public static string Issuer { get; private set; } = string.Empty;
 
-        public static string Audience { get; private set; } = string.Empty;
+        public static string Issuer { get; private set; } = string.Empty;
 
         public static int Lifetime { get; private set; } = 0;
 
@@ -26,7 +25,6 @@ namespace BusinessCalendar.Helpers
         public static void InitConfiguration()
         {
             Issuer = ConfigurationHelper.GetString("TokenIssuer");
-            Audience = ConfigurationHelper.GetString("TokenAudience");
             Lifetime = ConfigurationHelper.GetInt("TokenLifetime");
             _key = ConfigurationHelper.GetString("TokenKey");
         }
@@ -67,30 +65,30 @@ namespace BusinessCalendar.Helpers
             return false;
         }
 
-        public static (string, string) AuthorizeUser(User user)
+        public static (string, string) GetTokens(User user)
         {
             var token = GetToken(user);
-            user.RefreshToken = GetRefreshToken();
+            var refreshToken = GetRefreshToken();
 
-            return (token, user.RefreshToken);
+            return (token, refreshToken);
         }
 
-        public static (string, string) AuthorizeUser(string token, string refreshToken)
+        public static (string, string) GetRefreshedTokens(string token, string refreshToken, out User user)
         {
             if (_userDAO == null)
                 throw new Exception(_userDAONotInitializedError);
 
             var jwt = new JwtSecurityToken(token);
             var userId = long.Parse(jwt.Claims.First().Value);
-            var user = _userDAO.GetById(userId);
+            user = _userDAO.GetById(userId);
 
             if (user.RefreshToken != refreshToken)
                 throw new SecurityTokenNotYetValidException("Refresh token is not valid.");
 
             token = GetToken(user);
+            refreshToken = GetRefreshToken();
 
-            user.RefreshToken = GetRefreshToken();
-            return (token, user.RefreshToken);
+            return (token, refreshToken);
         }
 
         private static string GetToken(User user)
@@ -105,7 +103,6 @@ namespace BusinessCalendar.Helpers
 
             var jwt = new JwtSecurityToken(
                 issuer: Issuer,
-                audience: Audience,
                 notBefore: DateTime.UtcNow,
                 claims: claimsIdentity.Claims,
                 expires: DateTime.UtcNow.AddMinutes(Lifetime),

@@ -28,8 +28,6 @@ namespace BusinessCalendar
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidIssuer = AuthHelper.Issuer,
-                        ValidateAudience = true,
-                        ValidAudience = AuthHelper.Audience,
                         ValidateIssuer = true,
                         ValidateLifetime = true,
                         IssuerSigningKey = AuthHelper.GetSymmetricSecurityKey(),
