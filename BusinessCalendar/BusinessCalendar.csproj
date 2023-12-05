@@ -45,7 +45,7 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration.ToUpper())' != 'RELEASE'"> <!-- This condition need only for publish it as self contained application -->
     <Exec Command="dotnet tool restore" />
     <Exec Command="dotnet swagger tofile --output swagger.json $(OutputPath)\$(AssemblyName).dll v0" />
   </Target>
