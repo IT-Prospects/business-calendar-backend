@@ -8,9 +8,11 @@ using Model;
 using Model.DTO;
 using Model.Enum;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BusinessCalendar.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("[controller]")]
     public class EventController : Controller

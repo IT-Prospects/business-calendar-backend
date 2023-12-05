@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
 using Model;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BusinessCalendar.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("[controller]")]
     public class UserController : Controller
@@ -41,14 +43,64 @@ namespace BusinessCalendar.Controllers
                 {
                     return BadRequest("This email or phone number already registered");
                 }
-                using var sha256 = SHA256.Create();
 
-                item.PasswordHash = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(item.PasswordHash)));
+                item.PasswordHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(item.PasswordHash)));
 
                 var newItem = _userDAO.Create();
                 SetValues(item, newItem);
                 _unitOfWork.SaveChanges();
                 return Ok(new ResponseObject(MappingToDTO(newItem)));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
+        }
+
+        [HttpPost]
+        [Route("SignIn")]
+        public IActionResult SignIn(UserSignInDTO itemDTO)
+        {
+            try
+            {
+                AuthHelper.InitDAO(_userDAO);
+                if (!IsValidUserSignInDTO(itemDTO, out var message) ||
+                    !AuthHelper.AuthenticateUser(itemDTO, out message, out var user))
+                {
+                    return BadRequest(new ResponseObject(message));
+                }
+
+                var (token, refreshToken) = AuthHelper.GetTokens(user!);
+
+                user!.RefreshToken = refreshToken;
+
+                _unitOfWork.SaveChanges();
+                return Ok(new ResponseObject(new { token, refreshToken }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
+        }
+
+        [HttpPost]
+        [Route("RefreshToken")]
+        public IActionResult RefreshToken([FromBody] string refreshToken)
+        {
+            try
+            {
+                AuthHelper.InitDAO(_userDAO);
+                var authHeaderValue = HttpContext.Request.Headers.Authorization.ToString();
+                if (string.IsNullOrWhiteSpace(authHeaderValue))
+                    return BadRequest("Required Authorization header is missing.");
+
+                var token = authHeaderValue.Replace("Bearer ", "");
+                (token, refreshToken) = AuthHelper.GetRefreshedTokens(token, refreshToken, out var user);
+
+                user.RefreshToken = refreshToken;
+
+                _unitOfWork.SaveChanges();
+                return Ok(new ResponseObject(new { token, refreshToken }));
             }
             catch (Exception ex)
             {

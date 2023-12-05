@@ -1,7 +1,9 @@
 using BusinessCalendar.Helpers;
 using DAL.Common;
 using DAL.Context;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BusinessCalendar
 {
@@ -13,7 +15,27 @@ namespace BusinessCalendar
 
             ConfigurationHelper.SetConfiguration(builder.Configuration);
             ImageFileHelper.InitConfiguration();
-           
+            AuthHelper.InitConfiguration();
+
+            builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }
+            ).AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidIssuer = AuthHelper.Issuer,
+                        ValidateIssuer = true,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = AuthHelper.GetSymmetricSecurityKey(),
+                        ValidateIssuerSigningKey = true,
+                    };
+                }
+            );
+
             builder.Services.AddControllers().AddNewtonsoftJson(jsonOptions =>
             {
                 jsonOptions.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;

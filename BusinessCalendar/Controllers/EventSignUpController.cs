@@ -10,9 +10,11 @@ using ClosedXML.Excel;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
 using BusinessCalendar.ExcelReports;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BusinessCalendar.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("[controller]")]
     public class EventSignUpController : Controller
