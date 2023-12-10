@@ -69,7 +69,7 @@ jobs:
       with:
         access-key-id: ${{ secrets.ACCESS_KEY_ID }}
         secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
-        bucket: ${{ secrets.BUCKET }}
+        bucket: ${{ vars.MIGRATION_BUCKET }}
         include: migration-${{ steps.vars.outputs.BRANCH }}-${{ steps.vars.outputs.HASH }}-${{ steps.vars.outputs.DATE }}.txt
         
     - name: connect to vm and deploy 
