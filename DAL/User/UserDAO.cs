@@ -44,11 +44,11 @@ namespace DAL
             }
         }
 
-        public bool HasDuplicateByEmailOrPhoneNumber(string email, string phoneNumber)
+        public bool HasDuplicateByEmail(string email)
         {
             try
             {
-                return DbSetView.Any(x => x.Email == email || x.PhoneNumber == phoneNumber);
+                return DbSetView.Any(x => x.Email == email);
             }
             catch (Exception ex)
             {

@@ -10,8 +10,6 @@
 
         public string Email { get; set; }
 
-        public string PhoneNumber { get; set; }
-
         public string PasswordHash { get; set; }
 
         public string? RefreshToken { get; set; }
@@ -25,7 +23,6 @@
             FirstName = string.Empty;
             LastName = string.Empty;
             Email = string.Empty;
-            PhoneNumber = string.Empty;
             PasswordHash = string.Empty;
         }
 
@@ -33,14 +30,12 @@
             string firstName,
             string lastName,
             string email,
-            string phoneNumber,
             string passwordHash,
             string? refreshToken = null)
         {
             FirstName = firstName;
             LastName = lastName;
             Email = email;
-            PhoneNumber = phoneNumber;
             PasswordHash = passwordHash;
             RefreshToken = refreshToken;
         }
