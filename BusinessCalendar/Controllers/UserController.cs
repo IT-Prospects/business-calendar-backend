@@ -8,6 +8,7 @@ using Model.DTO;
 using Model;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace BusinessCalendar.Controllers
 {
@@ -25,6 +26,20 @@ namespace BusinessCalendar.Controllers
             _logger = logger;
             _unitOfWork = uow;
             _userDAO = new UserDAO(uow);
+        }
+
+        [HttpGet]
+        [Route("id={id}")]
+        public IActionResult Get(long id)
+        {
+            try
+            {
+                return Ok(new ResponseObject(MappingToDTO(_userDAO.GetById(id))));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseObject(ExceptionHelper.GetFullMessage(ex)));
+            }
         }
 
         [HttpPost]
