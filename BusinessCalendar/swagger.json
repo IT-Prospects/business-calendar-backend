@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Business Calendar API",
-    "version": "0.5.0"
+    "version": "0.6.0"
   },
   "paths": {
     "/Event/targetdate={targetDate}&offset={offset}": {
@@ -355,6 +355,30 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/User/id={id}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success"
