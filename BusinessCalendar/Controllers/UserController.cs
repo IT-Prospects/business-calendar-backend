@@ -39,9 +39,9 @@ namespace BusinessCalendar.Controllers
                 }
                 var item = MappingToDomainObject(itemDTO);
 
-                if (_userDAO.HasDuplicateByEmailOrPhoneNumber(item.Email, item.PhoneNumber))
+                if (_userDAO.HasDuplicateByEmail(item.Email))
                 {
-                    return BadRequest("This email or phone number already registered");
+                    return BadRequest("This email already registered");
                 }
 
                 item.PasswordHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(item.PasswordHash)));
@@ -129,9 +129,6 @@ namespace BusinessCalendar.Controllers
             if (string.IsNullOrWhiteSpace(item.LastName))
                 stringBuilder.AppendLine(string.Format(_requiredFieldErrorMessageTemplate, nameof(item.LastName)));
 
-            if (string.IsNullOrWhiteSpace(item.PhoneNumber))
-                stringBuilder.AppendLine(string.Format(_requiredFieldErrorMessageTemplate, nameof(item.PhoneNumber)));
-
             message = stringBuilder.ToString();
 
             return message == string.Empty;
@@ -159,7 +156,6 @@ namespace BusinessCalendar.Controllers
                         itemDTO.FirstName!,
                         itemDTO.LastName!,
                         itemDTO.Email!,
-                        itemDTO.PhoneNumber!,
                         itemDTO.Password!
                     );
         }
@@ -171,7 +167,6 @@ namespace BusinessCalendar.Controllers
                 FirstName = item.FirstName,
                 LastName = item.LastName,
                 Email = item.Email,
-                PhoneNumber = item.PhoneNumber
             };
         }
     }
