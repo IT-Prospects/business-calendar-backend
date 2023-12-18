@@ -23,6 +23,12 @@ jobs:
         echo ::set-output name=BRANCH::${GITHUB_REF#refs/heads/}
         echo ::set-output name=HASH::$(git rev-parse --short ${GITHUB_SHA})
         echo ::set-output name=DATE::$(date +'%d-%m-%Y')
+        echo ::set-output name=JWT_TOKEN::$(python scriptJWT.py ${{ secrets.service_account_id }} ${{ secrets.key_id }} "${{ secrets.PRIVATE_KEY }}")
+        if [ "${{ inputs.target-env }}" == "prod" ]; then
+          echo ::set-output name=ENVIRONMENT::"Production"
+        else 
+          echo ::set-output name=ENVIRONMENT::"Development"
+        fi
         
     - name: set imagename
       id: imagename
@@ -76,6 +82,8 @@ jobs:
       uses: appleboy/ssh-action@v1.0.0
       env: 
         IMAGE: cr.yandex/${{ vars.ID_CONTAINER_REGISTRY }}/${{ steps.imagename.outputs.IMAGENAME }}:${{ steps.vars.outputs.HASH }}
+        TOKEN: ${{ steps.vars.outputs.JWT_TOKEN }}
+        ENVIRONMENT: ${{ steps.vars.outputs.ENVIRONMENT }}
       with:
         host: ${{ vars.HOST }}
         username: ${{ vars.USERNAME }}
@@ -85,8 +93,10 @@ jobs:
         proxy_username: ${{ vars.PROXY_USERNAME }}
         proxy_key: ${{ secrets.PROXY_KEY }}
         proxy_port: ${{ vars.PROXY_PORT }}
-        envs: IMAGE
+        envs: IMAGE,TOKEN,ENVIRONMENT
         script: |
+          JWT_TOKEN="$TOKEN"
+          DOTNET_ENVIRONMENT="$ENVIRONMENT"
           sudo docker stop last_backend
           sudo docker rm last_backend
           sudo docker pull $IMAGE
